@@ -6,10 +6,10 @@ public class ArrayStorage {
     Resume[] storage = new Resume[10000];
 
     void clear() {
-        for (int i = size; i > 0; i--) {
+        for (int i = 0; i < size(); i++) {
             storage[i] = null;
-            size--;
         }
+        size = 0;
     }
 
     void save(Resume r) {
@@ -27,14 +27,13 @@ public class ArrayStorage {
     }
 
     void delete(String uuid) {
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size - 1; i++) {
             if (uuid.equals(storage[i].toString())) {
-                storage[i] = storage[i++];
-                for (int j = i - 1; j < size; j++) {
-                    storage[j] = storage[j++];
+                storage[i] = storage[i + 1];
+                for (int j = i; j < size; j++) {
+                    storage[j] = storage[j + 1];
                 }
                 size--;
-                break;
             }
         }
     }
@@ -45,9 +44,7 @@ public class ArrayStorage {
     Resume[] getAll() {
         Resume[] resumes = new Resume[size()];
         for (int i = 0; i < size; i++) {
-            for (int j = i; j < size(); j++) {
-                resumes[j] = storage[i];
-            }
+            resumes[i] = storage[i];
         }
         return resumes;
     }
