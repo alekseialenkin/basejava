@@ -2,12 +2,14 @@
  * Array based storage for Resumes
  */
 public class ArrayStorage {
+    private int size;
     Resume[] storage = new Resume[10000];
 
     void clear() {
         for (int i = 0; i < storage.length; i++) {
             if (storage[i] != null) {
                 storage[i] = null;
+                size --;
             }
         }
     }
@@ -16,6 +18,7 @@ public class ArrayStorage {
         for (int i = 0; i < storage.length; i++) {
             if (storage[i] == null) {
                 storage[i] = r;
+                size++;
                 break;
             }
         }
@@ -46,6 +49,7 @@ public class ArrayStorage {
                 storage[i] = null;
             }
         }
+        size--;
     }
 
     /**
@@ -67,12 +71,6 @@ public class ArrayStorage {
     }
 
     int size() {
-        int count = 0;
-        for (Resume resume : storage) {
-            if (resume != null) {
-                count++;
-            }
-        }
-        return count;
+        return size;
     }
 }
