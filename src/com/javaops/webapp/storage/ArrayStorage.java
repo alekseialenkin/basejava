@@ -12,7 +12,7 @@ public class ArrayStorage {
     private boolean isInStorage(Resume r){
         boolean is = false;
         for (int i = 0; i < size; i++) {
-            if (r == storage[i]) {
+            if (r.getUuid().equals(storage[i].getUuid())) {
                 is = true;
                 break;
             }
