@@ -2,74 +2,62 @@ package com.javaops.webapp.storage;
 
 import com.javaops.webapp.model.Resume;
 
+import java.util.Arrays;
+
 /**
  * Array based storage for Resumes
  */
 public class ArrayStorage {
     private int size;
-    private Resume[] storage = new Resume[10000];
+    private final int STORAGE_LIMIT = 10000;
+    private final Resume[] storage = new Resume[STORAGE_LIMIT];
 
-    private boolean isInStorage(Resume r){
-        boolean is = false;
+    private int getIndex(Resume r) {
         for (int i = 0; i < size; i++) {
             if (r.getUuid().equals(storage[i].getUuid())) {
-                is = true;
-                break;
+                return i;
             }
         }
-        return is;
+        return -1;
     }
-    private boolean isInStorage (String uuid){
-        boolean is = false;
+
+    private int getIndex(String uuid) {
         for (int i = 0; i < size; i++) {
             if (uuid.equals(storage[i].getUuid())) {
-                is = true;
-                break;
+                return i;
             }
         }
-        return is;
+        return -1;
     }
 
     public void clear() {
-        for (int i = 0; i < size; i++) {
-            storage[i] = null;
-        }
+        Arrays.fill(storage, null);
         size = 0;
     }
 
     public void save(Resume r) {
-        if (!isInStorage(r)) {
-            if (size < storage.length) {
-                storage[size] = r;
-                size++;
-            }
-            else System.out.println("Storage is full");
+        if (size == storage.length) {
+            System.out.println("Storage is full");
+        } else if (getIndex(r) > -1) System.out.println("Resume is in the storage: " + r.getUuid());
+        else {
+            storage[size] = r;
+            size++;
         }
-        else System.out.println("Resume is in the storage: " + r.getUuid());
     }
 
     public Resume get(String uuid) {
-        if (isInStorage(uuid)) {
-            for (int i = 0; i < size; i++) {
-                if (uuid.equals(storage[i].toString())) {
-                    return storage[i];
-                }
-            }
+        if (getIndex(uuid) != -1) {
+            return storage[getIndex(uuid)];
         }
-        System.out.println("Uuid is missing from the storage: " + uuid);
+        else System.out.println("Uuid is missing from the storage: " + uuid);
         return null;
     }
 
     public void delete(String uuid) {
-        if (isInStorage(uuid)) {
-            for (int i = 0; i < size; i++) {
-                if (uuid.equals(storage[i].toString())) {
-                    storage[i] = storage[size - 1];
-                    storage[size - 1] = null;
-                    size--;
-                    break;
-                }
-            }
+        if (getIndex(uuid) != -1) {
+            storage[getIndex(uuid)] = storage[size - 1];
+            storage[size - 1] = null;
+            size--;
         } else System.out.println("Uuid is missing from the storage: " + uuid);
     }
 
@@ -86,15 +74,11 @@ public class ArrayStorage {
     }
 
     public void update(Resume r) {
-        if (isInStorage(r)) {
-            for (int i = 0; i < size; i++) {
-                if (r == storage[i]) {
-                    storage[i].setUuid(r.getUuid());
-                    break;
-                }
+        if (getIndex(r) != -1) {
+            if (r == storage[getIndex(r)]) {
+                storage[getIndex(r)].setUuid(r.getUuid());
             }
-        }
-        else System.out.println("Uuid is missing from the storage: " + r.getUuid());
+        } else System.out.println("Uuid is missing from the storage: " + r.getUuid());
     }
 
     public int size() {
