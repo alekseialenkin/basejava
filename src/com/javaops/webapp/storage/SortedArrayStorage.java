@@ -27,7 +27,6 @@ public class SortedArrayStorage extends AbstractArrayStorage {
         }
     }
 
-
     @Override
     protected int getIndex(String uuid) {
         Resume searchKey = new Resume();
@@ -40,7 +39,7 @@ public class SortedArrayStorage extends AbstractArrayStorage {
         if (getIndex(uuid) < 0) {
             System.out.println("Uuid is missing from the storage: " + uuid);
         } else {
-            storage[getIndex(uuid)] = storage[getIndex(uuid) + 1];
+            storage[getIndex(uuid)] = storage[size - 1];
             storage[size - 1] = null;
             size--;
         }
