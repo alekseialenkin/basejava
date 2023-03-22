@@ -39,7 +39,8 @@ public abstract class AbstractArrayStorage implements Storage {
             System.out.println("Uuid is missing from the storage: " + r.getUuid());
         }
     }
-     public final void save(Resume r) {
+
+    public final void save(Resume r) {
         if (size == STORAGE_LIMIT) {
             System.out.println("Storage is full");
         } else if (getIndex(r.getUuid()) >= 0) {
@@ -49,6 +50,7 @@ public abstract class AbstractArrayStorage implements Storage {
             size++;
         }
     }
+
     public final void delete(String uuid) {
         if (getIndex(uuid) < 0) {
             System.out.println("Uuid is missing from the storage: " + uuid);

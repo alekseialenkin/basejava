@@ -7,7 +7,6 @@ import java.util.Arrays;
 public class SortedArrayStorage extends AbstractArrayStorage {
 
     @Override
-
     protected void savePart(Resume r) {
         storage[size] = storage[(getIndex(r.getUuid()) * -1) - 1];
         storage[(getIndex(r.getUuid()) * -1) - 1] = r;
