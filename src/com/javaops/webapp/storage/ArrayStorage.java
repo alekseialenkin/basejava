@@ -8,10 +8,10 @@ import com.javaops.webapp.model.Resume;
 public class ArrayStorage extends AbstractArrayStorage {
 
 
-    public void savePart (Resume r){
+    protected void savePart (Resume r){
         storage[size] = r;
     }
-    public void deletePart (String uuid){
+    protected void deletePart (String uuid){
         storage[getIndex(uuid)] = storage[size - 1];
     }
 
