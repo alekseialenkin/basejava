@@ -7,22 +7,17 @@ import com.javaops.webapp.model.Resume;
  */
 public class ArrayStorage extends AbstractArrayStorage {
 
-    public void save(Resume r) {
-        if (size == STORAGE_LIMIT) {
-            System.out.println("Storage is full");
-        } else if (getIndex(r.getUuid()) > -1) {
-            System.out.println("Resume is in the storage: " + r.getUuid());
-        } else {
-            storage[size] = r;
-            size++;
-        }
-    }
 
+    public void savePart (Resume r){
+        storage[size] = r;
+    }
+    public void deletePart (String uuid){
+        storage[getIndex(uuid)] = storage[size - 1];
+    }
     public void delete(String uuid) {
         if (getIndex(uuid) < 0) {
             System.out.println("Uuid is missing from the storage: " + uuid);
         } else {
-            storage[getIndex(uuid)] = storage[size - 1];
             storage[size - 1] = null;
             size--;
         }

@@ -39,12 +39,30 @@ public abstract class AbstractArrayStorage implements Storage {
             System.out.println("Uuid is missing from the storage: " + r.getUuid());
         }
     }
-
+     public final void save(Resume r) {
+        if (size == STORAGE_LIMIT) {
+            System.out.println("Storage is full");
+        } else if (getIndex(r.getUuid()) >= 0) {
+            System.out.println("Resume is in the storage: " + r.getUuid());
+        } else {
+            savePart(r);
+            size++;
+        }
+    }
+    public void delete(String uuid) {
+        if (getIndex(uuid) < 0) {
+            System.out.println("Uuid is missing from the storage: " + uuid);
+        } else {
+            deletePart(uuid);
+            storage[size - 1] = null;
+            size--;
+        }
+    }
 
     protected abstract int getIndex(String uuid);
 
-    public abstract void delete(String uuid);
+    public abstract void deletePart(String uuid);
 
-    public abstract void save(Resume r);
+    public abstract void savePart(Resume r);
 }
 
