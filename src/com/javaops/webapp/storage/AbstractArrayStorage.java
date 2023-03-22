@@ -49,7 +49,7 @@ public abstract class AbstractArrayStorage implements Storage {
             size++;
         }
     }
-    public void delete(String uuid) {
+    public final void delete(String uuid) {
         if (getIndex(uuid) < 0) {
             System.out.println("Uuid is missing from the storage: " + uuid);
         } else {

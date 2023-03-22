@@ -14,14 +14,6 @@ public class ArrayStorage extends AbstractArrayStorage {
     public void deletePart (String uuid){
         storage[getIndex(uuid)] = storage[size - 1];
     }
-    public void delete(String uuid) {
-        if (getIndex(uuid) < 0) {
-            System.out.println("Uuid is missing from the storage: " + uuid);
-        } else {
-            storage[size - 1] = null;
-            size--;
-        }
-    }
 
     @Override
     protected int getIndex(String uuid) {
