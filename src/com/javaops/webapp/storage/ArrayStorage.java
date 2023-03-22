@@ -19,22 +19,12 @@ public class ArrayStorage extends AbstractArrayStorage {
     }
 
     public void delete(String uuid) {
-        if (getIndex(uuid) != -1) {
+        if (getIndex(uuid) < 0) {
+            System.out.println("Uuid is missing from the storage: " + uuid);
+        } else {
             storage[getIndex(uuid)] = storage[size - 1];
             storage[size - 1] = null;
             size--;
-        } else {
-            System.out.println("Uuid is missing from the storage: " + uuid);
-        }
-    }
-
-    public void update(Resume r) {
-        if (getIndex(r.getUuid()) != -1) {
-            if (r == storage[getIndex(r.getUuid())]) {
-                storage[getIndex(r.getUuid())].setUuid(r.getUuid());
-            }
-        } else {
-            System.out.println("Uuid is missing from the storage: " + r.getUuid());
         }
     }
 
