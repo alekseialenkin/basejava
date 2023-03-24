@@ -81,7 +81,7 @@ public abstract class AbstractArrayStorageTest {
     public void storageIsFull()  {
         try {
             for (int i = 3; i < 10000; i++){
-                storage.save(new Resume("dummy"));
+                storage.save(new Resume());
             }
         }catch (StorageException storageException){
             Assertions.fail("Storage is full earlier than it need");
