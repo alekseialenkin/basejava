@@ -8,13 +8,13 @@ import com.javaops.webapp.model.Resume;
 public class ArrayStorage extends AbstractArrayStorage {
 
     @Override
-    protected void savePart(Resume r) {
+    protected void saveResume(Resume r, int index) {
         storage[size] = r;
     }
 
     @Override
-    protected void deletePart(String uuid) {
-        storage[getIndex(uuid)] = storage[size - 1];
+    protected void deleteResume(int index) {
+        storage[index] = storage[size - 1];
     }
 
     @Override

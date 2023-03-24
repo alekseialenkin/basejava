@@ -1,5 +1,8 @@
 package com.javaops.webapp.storage;
 
+import com.javaops.webapp.exception.ExistStorageException;
+import com.javaops.webapp.exception.NotExistStorageException;
+import com.javaops.webapp.exception.StorageException;
 import com.javaops.webapp.model.Resume;
 
 import java.util.Arrays;
@@ -14,11 +17,11 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     public final Resume get(String uuid) {
-        if (getIndex(uuid) < 0) {
-            System.out.println("Uuid is missing from the storage: " + uuid);
-            return null;
+        int index = getIndex(uuid);
+        if (index < 0) {
+            throw new NotExistStorageException(uuid);
         }
-        return storage[getIndex(uuid)];
+        return storage[index];
     }
 
     public final Resume[] getAll() {
@@ -31,31 +34,32 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     public final void update(Resume r) {
-        if (getIndex(r.getUuid()) >= 0) {
-            if (r == storage[getIndex(r.getUuid())]) {
-                storage[getIndex(r.getUuid())].setUuid(r.getUuid());
-            }
+        int index = getIndex(r.getUuid());
+        if (index < 0) {
+            throw new NotExistStorageException(r.getUuid());
         } else {
-            System.out.println("Uuid is missing from the storage: " + r.getUuid());
+            storage[index] = r;
         }
     }
 
     public final void save(Resume r) {
+        int index = getIndex(r.getUuid());
         if (size == STORAGE_LIMIT) {
-            System.out.println("Storage is full");
-        } else if (getIndex(r.getUuid()) >= 0) {
-            System.out.println("Resume is in the storage: " + r.getUuid());
+            throw new StorageException("Storage overflow",r.getUuid());
+        } else if (index >= 0) {
+            throw new ExistStorageException(r.getUuid());
         } else {
-            savePart(r);
+            saveResume(r, index);
             size++;
         }
     }
 
     public final void delete(String uuid) {
-        if (getIndex(uuid) < 0) {
-            System.out.println("Uuid is missing from the storage: " + uuid);
+        int index = getIndex(uuid);
+        if (index < 0) {
+            throw  new NotExistStorageException(uuid);
         } else {
-            deletePart(uuid);
+            deleteResume(index);
             storage[size - 1] = null;
             size--;
         }
@@ -63,8 +67,8 @@ public abstract class AbstractArrayStorage implements Storage {
 
     protected abstract int getIndex(String uuid);
 
-    protected abstract void deletePart(String uuid);
+    protected abstract void deleteResume(int index);
 
-    protected abstract void savePart(Resume r);
+    protected abstract void saveResume(Resume r, int index);
 }
 
