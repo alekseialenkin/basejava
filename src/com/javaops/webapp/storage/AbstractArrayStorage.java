@@ -13,6 +13,23 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         return size;
     }
 
+    protected void doSave(Object getExistingSearchKey, Resume r) {
+        saveResume(r);
+        sizeIncrease();
+    }
+
+    protected void doDelete(Object getNotExistingSearchKey, String uuid) {
+        deleteResume(uuid);
+        sizeReduction();
+    }
+
+    protected Resume doGet(Object getNotExistingSearchKey, String uuid) {
+        return getResume(getNotExistingSearchKey);
+    }
+
+    protected void doUpdate(Object getNotExistingSearchKey, Resume r) {
+        updateResume(r);
+    }
 
     protected final Resume[] ResumesGetAll() {
         return Arrays.copyOfRange(storage, 0, size);
@@ -23,8 +40,8 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         size = 0;
     }
 
-    protected final void updateResume(int index, Resume r) {
-        storage[index] = r;
+    protected final void updateResume(Resume r) {
+        storage[getIndex(r.getUuid())] = r;
     }
 
     protected final void sizeReduction() {
@@ -35,9 +52,20 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     protected final void sizeIncrease() {
         size++;
     }
-    public Resume getResume(int index){
-        return storage[index];
+
+    public Resume getResume(Object searchKey) {
+        return storage[getIndex((String) searchKey)];
     }
 
+    protected abstract void saveResume(Resume r);
+
+    protected abstract void deleteResume(String uuid);
+
+    protected boolean isExist(Object searchKey) {
+        for (int i = 0; i < size; i++) {
+            if (storage[i].getUuid().equals(searchKey)) return true;
+        }
+        return false;
+    }
 }
 
