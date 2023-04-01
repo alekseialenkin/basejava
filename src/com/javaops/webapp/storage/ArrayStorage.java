@@ -13,14 +13,14 @@ public class ArrayStorage extends AbstractArrayStorage {
     }
 
     @Override
-    protected void deleteResume(String uuid) {
-        storage[getIndex(uuid)] = storage[size - 1];
+    protected void deleteResume(Resume r ) {
+        storage[getIndex(r)] = storage[size - 1];
     }
 
     @Override
-    protected int getIndex(String uuid) {
+    protected int getIndex(Resume r) {
         for (int i = 0; i < size; i++) {
-            if (uuid.equals(storage[i].getUuid())) {
+            if (r.equals(storage[i])) {
                 return i;
             }
         }

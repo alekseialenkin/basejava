@@ -5,6 +5,8 @@ import com.javaops.webapp.exception.NotExistStorageException;
 import com.javaops.webapp.exception.StorageException;
 import com.javaops.webapp.model.Resume;
 
+import java.util.List;
+
 public abstract class AbstractStorage implements Storage {
     @Override
     public final void clear() {
@@ -13,7 +15,7 @@ public abstract class AbstractStorage implements Storage {
 
     @Override
     public final void update(Resume r) {
-        doUpdate(getNotExistingSearchKey(r.getUuid()),r);
+        doUpdate(getNotExistingSearchKey(r), r);
     }
 
     @Override
@@ -26,38 +28,26 @@ public abstract class AbstractStorage implements Storage {
     }
 
     @Override
-    public final Resume get(String uuid) {
-        return doGet(getNotExistingSearchKey(uuid),uuid);
-    }
-    
-    @Override
-    public final void delete(String uuid) {
-        doDelete(getNotExistingSearchKey(uuid),uuid);
+    public final Resume get(Resume r) {
+        return doGet(getNotExistingSearchKey(r), r.getUuid());
     }
 
+    @Override
+    public final void delete(Resume r) {
+        doDelete(getNotExistingSearchKey(r), r);
+    }
 
     @Override
-    public final Resume[] getAll() {
+    public final List<Resume> getAllSorted() {
+        ResumesGetAll().sort((o1, o2) -> {
+            if (o1.getFullName().equals(o2.getFullName())) return o1.getUuid().compareTo(o2.getUuid());
+            return o1.getFullName().compareTo(o2.getFullName());
+        });
         return ResumesGetAll();
     }
 
     @Override
-    public int size() {
-        return 0;
-    }
-
-    protected abstract int getIndex(String uuid);
-
-    protected abstract void clearResumes();
-
-
-    protected abstract Resume[] ResumesGetAll();
-
-    protected abstract boolean isExist(Object searchKey);
-    protected abstract void doSave(Object getExistingSearchKey, Resume r);
-    protected abstract void doDelete(Object getNotExistingSearchKey, String uuid);
-    protected abstract Resume doGet(Object getNotExistingSearchKey,String uuid);
-    protected abstract void doUpdate(Object getNotExistingSearchKey, Resume r);
+    public abstract int size();
 
     private Object getExistingSearchKey(Resume r) {
         if (isExist(r)) throw new ExistStorageException(r.getUuid());
@@ -66,10 +56,25 @@ public abstract class AbstractStorage implements Storage {
         }
     }
 
-    private Object getNotExistingSearchKey(String uuid) {
-        if (!isExist(uuid)) throw new NotExistStorageException(uuid);
+    private Object getNotExistingSearchKey(Resume r) {
+        if (!isExist(r)) throw new NotExistStorageException(r.getUuid());
         else {
-            return uuid;
+            return r;
         }
     }
+
+    protected abstract int getIndex(Resume r);
+
+    protected abstract void clearResumes();
+
+    protected abstract List<Resume> ResumesGetAll();
+
+    protected abstract boolean isExist(Object searchKey);
+
+    protected abstract void doSave(Object getExistingSearchKey, Resume r);
+
+    protected abstract void doDelete(Object getNotExistingSearchKey, Resume r);
+    protected abstract Resume doGet(Object getNotExistingSearchKey, String uuid);
+
+    protected abstract void doUpdate(Object getNotExistingSearchKey, Resume r);
 }

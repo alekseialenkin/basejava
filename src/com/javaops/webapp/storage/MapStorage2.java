@@ -2,10 +2,13 @@ package com.javaops.webapp.storage;
 
 import com.javaops.webapp.model.Resume;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class ListStorage extends AbstractStorage {
-    private final List<Resume> storage = new ArrayList<>();
+public class MapStorage2 extends AbstractStorage {
+    private final Map<String, Resume> storage = new HashMap<>();
 
     @Override
     public int size() {
@@ -14,10 +17,7 @@ public class ListStorage extends AbstractStorage {
 
     @Override
     protected int getIndex(Resume r) {
-        for (int i = 0; i < storage.size(); i++) {
-            if (storage.get(i).equals(r)) return i;
-        }
-        return -1;
+        return 0;
     }
 
     @Override
@@ -27,17 +27,17 @@ public class ListStorage extends AbstractStorage {
 
     @Override
     protected List<Resume> ResumesGetAll() {
-        return storage;
+        return Arrays.asList(storage.values().toArray(new Resume[0]));
     }
 
     @Override
     protected boolean isExist(Object searchKey) {
-        return storage.contains(searchKey);
+        return storage.containsValue(searchKey);
     }
 
     @Override
     protected void doSave(Object getExistingSearchKey, Resume r) {
-        storage.add(r);
+        storage.put(r.getUuid(),r);
     }
 
     @Override
@@ -47,13 +47,11 @@ public class ListStorage extends AbstractStorage {
 
     @Override
     protected Resume doGet(Object getNotExistingSearchKey, String uuid) {
-        return storage.get(getIndex((Resume) getNotExistingSearchKey));
+        return storage.get(uuid);
     }
 
     @Override
     protected void doUpdate(Object getNotExistingSearchKey, Resume r) {
-        storage.set(getIndex((Resume) getNotExistingSearchKey),r);
+
     }
-
-
 }

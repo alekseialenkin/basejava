@@ -3,6 +3,7 @@ package com.javaops.webapp.storage;
 import com.javaops.webapp.model.Resume;
 
 import java.util.Arrays;
+import java.util.List;
 
 public abstract class AbstractArrayStorage extends AbstractStorage {
     protected int size = 0;
@@ -18,8 +19,8 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         sizeIncrease();
     }
 
-    protected void doDelete(Object getNotExistingSearchKey, String uuid) {
-        deleteResume(uuid);
+    protected void doDelete(Object getNotExistingSearchKey, Resume r) {
+        deleteResume(r);
         sizeReduction();
     }
 
@@ -31,8 +32,8 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         updateResume(r);
     }
 
-    protected final Resume[] ResumesGetAll() {
-        return Arrays.copyOfRange(storage, 0, size);
+    protected final List<Resume> ResumesGetAll() {
+        return Arrays.asList(Arrays.copyOfRange(storage, 0, size));
     }
 
     protected final void clearResumes() {
@@ -41,7 +42,7 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     protected final void updateResume(Resume r) {
-        storage[getIndex(r.getUuid())] = r;
+        storage[getIndex(r)] = r;
     }
 
     protected final void sizeReduction() {
@@ -54,16 +55,16 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     public Resume getResume(Object searchKey) {
-        return storage[getIndex((String) searchKey)];
+        return storage[getIndex((Resume) searchKey)];
     }
 
     protected abstract void saveResume(Resume r);
 
-    protected abstract void deleteResume(String uuid);
+    protected abstract void deleteResume(Resume r);
 
     protected boolean isExist(Object searchKey) {
         for (int i = 0; i < size; i++) {
-            if (storage[i].getUuid().equals(searchKey)) return true;
+            if (storage[i].equals(searchKey)) return true;
         }
         return false;
     }

@@ -1,19 +1,24 @@
 package com.javaops.webapp.model;
 
-import java.util.UUID;
+import java.util.Objects;
 
 /**
  * Initial resume class
  */
-public class Resume implements Comparable <Resume> {
+public class Resume {
 
     // Unique identifier
     private final String uuid;
-    public Resume(){
-        this(UUID.randomUUID().toString());
+    private final String fullName;
+
+    public Resume() {
+        uuid = String.valueOf(Math.random() * 10000);
+        fullName = "dummy";
     }
-    public Resume(String uuid) {
+
+    public Resume(String uuid, String fullName) {
         this.uuid = uuid;
+        this.fullName = fullName;
     }
 
 
@@ -26,21 +31,23 @@ public class Resume implements Comparable <Resume> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Resume resume = (Resume) o;
-        return uuid.equals(resume.uuid);
+        return Objects.equals(uuid, resume.uuid) && Objects.equals(fullName, resume.fullName);
     }
 
     @Override
     public int hashCode() {
-        return uuid.hashCode();
+        return Objects.hash(uuid, fullName);
+    }
+
+    public String getFullName() {
+        return fullName;
     }
 
     @Override
     public String toString() {
-        return uuid;
-    }
-
-    @Override
-    public int compareTo(Resume o) {
-        return uuid.compareTo(o.uuid);
+        return "Resume{" +
+                "uuid='" + uuid + '\'' +
+                ", fullName='" + fullName + '\'' +
+                '}';
     }
 }
