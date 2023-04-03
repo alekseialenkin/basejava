@@ -1,7 +1,6 @@
 package com.javaops.webapp.storage;
 
 import com.javaops.webapp.exception.StorageException;
-import com.javaops.webapp.model.Resume;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -14,12 +13,12 @@ public abstract class AbstractArrayStorageTest extends AbstractStorageTest {
         try {
             storage.clear();
             for (int i = 0; i < AbstractArrayStorage.STORAGE_LIMIT; i++) {
-                storage.save(new Resume("Dummy"));
+                storage.save(dummy);
             }
         } catch (StorageException storageException) {
             Assertions.fail("Storage is full earlier than it need");
         }
-        Assertions.assertThrows(StorageException.class, () -> storage.save(new Resume("Dummy")));
+        Assertions.assertThrows(StorageException.class, () -> storage.save(dummy));
     }
     public final void assertSize(int size) {
         Assertions.assertEquals(size, storage.size());
