@@ -13,9 +13,10 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected int getIndex(Resume r) {
+    protected Object getSearchKey(Object searchKey) {
+        Resume r = new Resume(searchKey.toString(),"d");
         for (int i = 0; i < storage.size(); i++) {
-            if (storage.get(i).equals(r)) return i;
+            if (storage.get(i).getUuid().equals(r.getUuid())) return storage.get(i);
         }
         return -1;
     }
@@ -26,7 +27,7 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected List<Resume> ResumesGetAll() {
+    protected List<Resume> doGetAll() {
         return storage;
     }
 
@@ -36,23 +37,23 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected void doSave(Object getExistingSearchKey, Resume r) {
+    protected void doSave(Object searchKey, Resume r) {
         storage.add(r);
     }
 
     @Override
-    protected void doDelete(Object getNotExistingSearchKey, Resume r) {
+    protected void doDelete(Object searchKey, Resume r) {
         storage.remove(r);
     }
 
     @Override
-    protected Resume doGet(Object getNotExistingSearchKey, String uuid) {
-        return storage.get(getIndex((Resume) getNotExistingSearchKey));
+    protected Resume doGet(Object searchKEy, String uuid) {
+        return (Resume) getSearchKey(uuid);
     }
 
     @Override
-    protected void doUpdate(Object getNotExistingSearchKey, Resume r) {
-        storage.set(getIndex((Resume) getNotExistingSearchKey),r);
+    protected void doUpdate(Object searchKey, Resume r) {
+        storage.add(r);
     }
 
 

@@ -1,6 +1,7 @@
 package com.javaops.webapp.model;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Initial resume class
@@ -11,15 +12,15 @@ public class Resume {
     private final String uuid;
     private final String fullName;
 
-    public Resume() {
-        uuid = String.valueOf(Math.random() * 10000);
-        fullName = "dummy";
+    public Resume(String fullName) {
+        this(UUID.randomUUID().toString(), fullName);
     }
 
     public Resume(String uuid, String fullName) {
         this.uuid = uuid;
         this.fullName = fullName;
     }
+
 
 
     public String getUuid() {

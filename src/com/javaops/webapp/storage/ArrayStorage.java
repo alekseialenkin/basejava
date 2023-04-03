@@ -7,20 +7,21 @@ import com.javaops.webapp.model.Resume;
  */
 public class ArrayStorage extends AbstractArrayStorage {
 
+
     @Override
     protected void saveResume(Resume r) {
         storage[size] = r;
     }
 
     @Override
-    protected void deleteResume(Resume r ) {
-        storage[getIndex(r)] = storage[size - 1];
+    protected void deleteResume(String uuid ) {
+        storage[(int) getSearchKey(uuid)] = storage[size - 1];
     }
 
     @Override
-    protected int getIndex(Resume r) {
+    protected Object getSearchKey(Object searchKey) {
         for (int i = 0; i < size; i++) {
-            if (r.equals(storage[i])) {
+            if (searchKey.equals(storage[i].getUuid())) {
                 return i;
             }
         }

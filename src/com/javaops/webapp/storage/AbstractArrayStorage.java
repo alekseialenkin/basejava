@@ -1,5 +1,6 @@
 package com.javaops.webapp.storage;
 
+import com.javaops.webapp.exception.StorageException;
 import com.javaops.webapp.model.Resume;
 
 import java.util.Arrays;
@@ -14,25 +15,28 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         return size;
     }
 
-    protected void doSave(Object getExistingSearchKey, Resume r) {
+    protected void doSave(Object searchKey, Resume r) {
+        if (size == STORAGE_LIMIT) {
+            throw new StorageException("Storage overflow", r.getUuid());
+        }
         saveResume(r);
         sizeIncrease();
     }
 
-    protected void doDelete(Object getNotExistingSearchKey, Resume r) {
-        deleteResume(r);
+    protected void doDelete(Object searchKey, Resume r) {
+        deleteResume(r.getUuid());
         sizeReduction();
     }
 
-    protected Resume doGet(Object getNotExistingSearchKey, String uuid) {
-        return getResume(getNotExistingSearchKey);
+    protected Resume doGet(Object searchKey, String uuid) {
+        return getResume(uuid);
     }
 
-    protected void doUpdate(Object getNotExistingSearchKey, Resume r) {
+    protected void doUpdate(Object searchKey, Resume r) {
         updateResume(r);
     }
 
-    protected final List<Resume> ResumesGetAll() {
+    protected final List<Resume> doGetAll() {
         return Arrays.asList(Arrays.copyOfRange(storage, 0, size));
     }
 
@@ -41,8 +45,8 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         size = 0;
     }
 
-    protected final void updateResume(Resume r) {
-        storage[getIndex(r)] = r;
+    protected final void updateResume(Resume r){
+        storage[(int) getSearchKey(r.getUuid())] = r;
     }
 
     protected final void sizeReduction() {
@@ -55,18 +59,15 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     public Resume getResume(Object searchKey) {
-        return storage[getIndex((Resume) searchKey)];
+        return storage[(int) getSearchKey(searchKey)];
     }
 
     protected abstract void saveResume(Resume r);
 
-    protected abstract void deleteResume(Resume r);
+    protected abstract void deleteResume(String uuid);
 
     protected boolean isExist(Object searchKey) {
-        for (int i = 0; i < size; i++) {
-            if (storage[i].equals(searchKey)) return true;
-        }
-        return false;
+        return (Integer) searchKey >= 0;
     }
 }
 

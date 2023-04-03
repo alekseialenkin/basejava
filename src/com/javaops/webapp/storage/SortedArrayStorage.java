@@ -9,18 +9,19 @@ public class SortedArrayStorage extends AbstractArrayStorage {
 
     @Override
     protected void saveResume(Resume r) {
-        storage[size] = storage[(getIndex(r) * -1) - 1];
-        storage[(getIndex(r) * -1) - 1] = r;
+        storage[size] = storage[((Integer) getSearchKey(r.getUuid()) * -1) - 1];
+        storage[((Integer)getSearchKey(r.getUuid()) * -1) - 1] = r;
     }
 
     @Override
-    protected void deleteResume(Resume r) {
-        int indexMove = size - getIndex(r) - 1;
-        System.arraycopy(storage, getIndex(r) + 1, storage, getIndex(r), indexMove);
+    protected void deleteResume(String uuid) {
+        int indexMove = size - (Integer)getSearchKey(uuid) - 1;
+        System.arraycopy(storage, (Integer)getSearchKey(uuid) + 1, storage, (Integer)getSearchKey(uuid), indexMove);
     }
 
     @Override
-    protected int getIndex(Resume r) {
+    protected Object getSearchKey(Object searchKey) {
+        Resume r = new Resume(searchKey.toString(),"");
         return Arrays.binarySearch(storage, 0, size, r, RESUME_COMPARATOR);
     }
 
