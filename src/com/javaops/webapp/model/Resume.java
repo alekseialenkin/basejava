@@ -1,5 +1,7 @@
 package com.javaops.webapp.model;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -21,8 +23,8 @@ public class Resume {
         this.fullName = fullName;
     }
 
-
-
+    Map<String,AbstractSection> sections = new HashMap<>();
+    Map<ContactType,String> contacts;
     public String getUuid() {
         return uuid;
     }
