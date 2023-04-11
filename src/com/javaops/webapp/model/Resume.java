@@ -23,8 +23,9 @@ public class Resume {
         this.fullName = fullName;
     }
 
-    Map<String,AbstractSection> sections = new HashMap<>();
-    Map<ContactType,String> contacts;
+    Map<String, AbstractSection> sections = new HashMap<>();
+    Map<ContactType, String> contacts = new HashMap<>();
+
     public String getUuid() {
         return uuid;
     }
