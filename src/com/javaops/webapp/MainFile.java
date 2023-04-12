@@ -26,7 +26,5 @@ public class MainFile {
             //рекурсивный обход
             out(filePath);
         }
-
-
     }
 }
