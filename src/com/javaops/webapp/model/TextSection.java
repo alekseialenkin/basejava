@@ -3,7 +3,16 @@ package com.javaops.webapp.model;
 import java.util.Objects;
 
 public class TextSection extends AbstractSection {
-    private String text;
+    private final String text;
+
+    public TextSection(String text) {
+        Objects.requireNonNull(text, "text must not be null");
+        this.text = text;
+    }
+
+    public String getText() {
+        return text;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -25,7 +34,4 @@ public class TextSection extends AbstractSection {
                 '}';
     }
 
-    public String getText() {
-        return text;
-    }
 }

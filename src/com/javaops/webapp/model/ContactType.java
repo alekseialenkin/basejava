@@ -14,4 +14,7 @@ public enum ContactType {
 
     private String connectWay;
 
+    public String getConnectWay() {
+        return connectWay;
+    }
 }
