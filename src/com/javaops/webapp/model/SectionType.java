@@ -8,7 +8,7 @@ public enum SectionType {
     EXPERIENCE("Опыт работы"),
     EDUCATION("Образование");
     private String title;
-
+    private static final long serialVersionUID =1L;
     SectionType(String title) {
         this.title = title;
     }

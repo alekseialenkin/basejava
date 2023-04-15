@@ -41,12 +41,12 @@ public class ListStorage extends AbstractStorage<Integer> {
     }
 
     @Override
-    protected void doDelete(Integer searchKey, Resume r) {
-        storage.remove(r);
+    protected void doDelete(Integer searchKey) {
+        storage.remove(doGet(searchKey));
     }
 
     @Override
-    protected Resume doGet(Integer searchKEy, String uuid) {
+    protected Resume doGet(Integer searchKEy) {
         return storage.get(searchKEy);
     }
 

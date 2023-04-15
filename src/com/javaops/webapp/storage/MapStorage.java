@@ -42,13 +42,13 @@ public class MapStorage extends AbstractStorage<String> {
     }
 
     @Override
-    protected void doDelete(String searchKey, Resume r) {
+    protected void doDelete(String searchKey) {
         storage.remove(searchKey);
     }
 
     @Override
-    protected Resume doGet(String searchKey, String uuid) {
-        return storage.get(uuid);
+    protected Resume doGet(String searchKey) {
+        return storage.get(searchKey);
     }
 
     @Override

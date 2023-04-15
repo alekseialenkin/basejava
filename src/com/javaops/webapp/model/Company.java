@@ -1,27 +1,35 @@
 package com.javaops.webapp.model;
 
+import com.javaops.webapp.util.DateUtil;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class Company {
-    private final String name;
-    private final String website;
+import static com.javaops.webapp.util.DateUtil.NOW;
+
+public class Company implements Serializable {
+    @Serial
+    private static final long serialVersionUID =1L;
+    private final Link website;
     private final List<Period> periods;
 
-    public Company(String name, String website, List<Period> periods) {
-        Objects.requireNonNull(name,"name must not be null");
-        Objects.requireNonNull(website,"website must not be null");
-        Objects.requireNonNull(periods,"periods must not be null");
-        this.name = name;
+    public Company(String name, String url, Period... periods) {
+        this(new Link(name, url), Arrays.asList(periods));
+    }
+
+    public Company(Link website, List<Period> periods) {
+        Objects.requireNonNull(website, "website must not be null");
+        Objects.requireNonNull(periods, "periods must not be null");
         this.website = website;
         this.periods = periods;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getWebsite() {
+    public Link getWebsite() {
         return website;
     }
 
@@ -32,7 +40,6 @@ public class Company {
     @Override
     public String toString() {
         return "Company{" +
-                "name='" + name + '\'' +
                 ", website='" + website + '\'' +
                 ", periods=" + periods +
                 '}';
@@ -43,11 +50,69 @@ public class Company {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Company company = (Company) o;
-        return Objects.equals(name, company.name) && Objects.equals(website, company.website) && Objects.equals(periods, company.periods);
+        return Objects.equals(website, company.website) && Objects.equals(periods, company.periods);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, website, periods);
+        return Objects.hash(website, periods);
+    }
+
+    public static class Period implements Serializable{
+        @Serial
+        private static final long serialVersionUID =1L;
+        private final LocalDate begin;
+        private final LocalDate end;
+        private final String title;
+        private final String description;
+
+        public Period(int startYear, Month startMonth, String title, String description) {
+            this(DateUtil.of(startYear, startMonth), NOW, title, description);
+        }
+
+        public Period(int startYear, Month startMonth, int endYear, Month endMonth, String title, String description) {
+            this(DateUtil.of(startYear, startMonth), DateUtil.of(endYear, endMonth), title, description);
+        }
+
+        public Period(LocalDate begin, LocalDate end, String title, String description) {
+            this.begin = begin;
+            this.end = end;
+            this.title = title;
+            this.description = description;
+        }
+
+        public LocalDate getBegin() {
+            return begin;
+        }
+
+        public LocalDate getEnd() {
+            return end;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Period period = (Period) o;
+            return Objects.equals(begin, period.begin) && Objects.equals(end, period.end) && Objects.equals(title, period.title) && Objects.equals(description, period.description);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(begin, end, title, description);
+        }
+
+        @Override
+        public String toString() {
+            return "Period(" + begin + "," + end + "," + title + "," + description + ")";
+        }
     }
 }

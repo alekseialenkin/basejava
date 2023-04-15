@@ -26,13 +26,13 @@ public abstract class AbstractStorage<SK> implements Storage {
     @Override
     public final Resume get(Resume r) {
         LOG.info("Get" + r);
-        return doGet(getNotExistingSearchKey(r.getUuid()), r.getUuid());
+        return doGet(getNotExistingSearchKey(r.getUuid()));
     }
 
     @Override
     public final void delete(Resume r) {
         LOG.info("Delete" + r);
-        doDelete(getNotExistingSearchKey(r.getUuid()), r);
+        doDelete(getNotExistingSearchKey(r.getUuid()));
     }
 
     private final static Comparator<Resume> RESUME_COMPARATOR = Comparator.comparing(Resume::getFullName).thenComparing(Resume::getUuid);
@@ -72,9 +72,9 @@ public abstract class AbstractStorage<SK> implements Storage {
 
     protected abstract void doSave(SK searchKey, Resume r);
 
-    protected abstract void doDelete(SK searchKey, Resume r);
+    protected abstract void doDelete(SK searchKey);
 
-    protected abstract Resume doGet(SK searchKey, String uuid);
+    protected abstract Resume doGet(SK searchKey);
 
     protected abstract void doUpdate(SK searchKey, Resume r);
 }

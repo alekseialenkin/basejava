@@ -1,10 +1,18 @@
 package com.javaops.webapp.model;
 
+import java.io.Serial;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 public class ListSection extends AbstractSection {
+    @Serial
+    private static final long serialVersionUID =1L;
     private final List<String> strings;
+
+    public ListSection(String... strings) {
+        this(Arrays.asList(strings));
+    }
 
     public ListSection(List<String> strings) {
         Objects.requireNonNull(strings, "strings must not be null");

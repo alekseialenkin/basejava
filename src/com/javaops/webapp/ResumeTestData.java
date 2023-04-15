@@ -1,11 +1,12 @@
 package com.javaops.webapp;
 
 import com.javaops.webapp.model.*;
-import com.javaops.webapp.util.DateUtil;
 
-import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
+
+import static com.javaops.webapp.util.DateUtil.NOW;
+import static com.javaops.webapp.util.DateUtil.of;
 
 public class ResumeTestData {
     public static Resume resumeTest(String fullName,String uuid){
@@ -44,24 +45,24 @@ public class ResumeTestData {
                 Отличное знание и опыт применения концепций ООП, SOA, шаблонов проектрирования, архитектурных шаблонов, UML, функционального программирования
                 Родной русский, английский "upper intermediate\"""");
         r.getSections().put(SectionType.QUALIFICATIONS, qualifications);
-        Period MFTIschool = new Period(DateUtil.of(1984, Month.SEPTEMBER), DateUtil.of(1987, Month.JUNE), "Заочная физико-техническая школа при МФТИ", "Закончил с отличием");
-        List<Period> MFTIStudying = List.of(MFTIschool);
-        Company mfti = new Company("МФТИ", "https://mipt.ru/", MFTIStudying);
-        Period engineer = new Period(DateUtil.of(1987, Month.SEPTEMBER), DateUtil.of(1993, Month.JULY), "Санкт-Петербургский национальный исследовательский университет информационных технологий, механики и оптики", "Инженер (программист Fortran, C)");
-        Period phD = new Period(DateUtil.of(1993, Month.SEPTEMBER), DateUtil.of(1996, Month.JULY), "Санкт-Петербургский национальный исследовательский университет информационных технологий, механики и оптики", "Аспирантура (программист С, С++)");
-        List<Period> SPBNRUITMOstudying = List.of(engineer, phD);
-        Company SPBNRUITMO = new Company("Санкт-Петербургский национальный исследовательский университет информационных технологий, механики и оптики", "http://www.ifmo.ru/", SPBNRUITMOstudying);
+        Company.Period MFTIschool = new Company.Period(of(1984, Month.SEPTEMBER), of(1987, Month.JUNE), "Заочная физико-техническая школа при МФТИ", "Закончил с отличием");
+        List<Company.Period> MFTIStudying = List.of(MFTIschool);
+        Company mfti = new Company( new Link("МФТИ","https://mipt.ru/"), MFTIStudying);
+        Company.Period engineer = new Company.Period(of(1987, Month.SEPTEMBER), of(1993, Month.JULY), "Санкт-Петербургский национальный исследовательский университет информационных технологий, механики и оптики", "Инженер (программист Fortran, C)");
+        Company.Period phD = new Company.Period(of(1993, Month.SEPTEMBER), of(1996, Month.JULY), "Санкт-Петербургский национальный исследовательский университет информационных технологий, механики и оптики", "Аспирантура (программист С, С++)");
+        List<Company.Period> SPBNRUITMOstudying = List.of(engineer, phD);
+        Company SPBNRUITMO = new Company(new Link("ifmo","http://www.ifmo.ru/"), SPBNRUITMOstudying);
         AbstractSection education = new CompanySection(List.of(mfti, SPBNRUITMO));
         r.getSections().put(SectionType.EDUCATION, education);
-        Period ritCenterWorking = new Period(DateUtil.of(2012, Month.of(4)), DateUtil.of(2014, Month.of(10)), "Java architector", "Организация процесса разработки системы ERP для разных окружений: релизная политика, версионирование, ведение CI (Jenkins), миграция базы (кастомизация Flyway), конфигурирование системы (pgBoucer, Nginx), AAA via SSO." +
+        Company.Period ritCenterWorking = new Company.Period(of(2012, Month.of(4)), of(2014, Month.of(10)), "Java architector", "Организация процесса разработки системы ERP для разных окружений: релизная политика, версионирование, ведение CI (Jenkins), миграция базы (кастомизация Flyway), конфигурирование системы (pgBoucer, Nginx), AAA via SSO." +
                 " Архитектура БД и серверной части системы. " +
                 "Разработка интергационных сервисов: CMIS, BPMN2, 1C (WebServices), сервисов общего назначения (почта, экспорт в pdf, doc, html). " +
                 "Интеграция Alfresco JLAN для online редактирование из браузера документов MS Office. Maven + plugin development, Ant, Apache Commons, Spring security, Spring MVC, Tomcat,WSO2, xcmis, OpenCmis, Bonita, Python scripting, Unix shell remote scripting via ssh tunnels, PL/Python");
-        Company ritCenter = new Company("RIT Center", "null", List.of(ritCenterWorking));
-        Company wrike = new Company("Wrike", "https://www.wrike.com/", List.of(new Period(DateUtil.of(2014, Month.of(10)), DateUtil.of(2016, Month.of(1)), "Старший разработчик (backend)", "Проектирование и разработка онлайн платформы управления проектами Wrike (Java 8 API, Maven, Spring, MyBatis, Guava, Vaadin, PostgreSQL, Redis). " +
+        Company ritCenter = new Company( new Link("RIT Center", "null"), List.of(ritCenterWorking));
+        Company wrike = new Company(new Link("WRIKE","https://www.wrike.com/"), List.of(new Company.Period(of(2014, Month.of(10)), of(2016, Month.of(1)), "Старший разработчик (backend)", "Проектирование и разработка онлайн платформы управления проектами Wrike (Java 8 API, Maven, Spring, MyBatis, Guava, Vaadin, PostgreSQL, Redis). " +
                 "Двухфакторная аутентификация, авторизация по OAuth1, OAuth2, JWT SSO.")));
-        Period javaOnlineProjectsPeriod = new Period(DateUtil.of(2013,Month.of(10)), LocalDate.now(),"Java Online Projects","Автор проекта");
-        Company JOP = new Company("Java online Projects", "http://javaops.ru/",List.of(javaOnlineProjectsPeriod));
+        Company.Period javaOnlineProjectsPeriod = new Company.Period(of(2013,Month.of(10)), NOW,"Java Online Projects","Автор проекта");
+        Company JOP = new Company(new Link("Java Online Projects","http://javaops.ru/"),List.of(javaOnlineProjectsPeriod));
         CompanySection job = new CompanySection(List.of(ritCenter, wrike));
         r.getSections().put(SectionType.EXPERIENCE, job);
         return r;

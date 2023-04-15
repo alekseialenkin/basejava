@@ -23,12 +23,12 @@ public abstract class AbstractArrayStorage extends AbstractStorage<Integer> {
         sizeIncrease();
     }
 
-    protected void doDelete(Integer searchKey, Resume r) {
-        deleteResume(r.getUuid());
+    protected void doDelete(Integer searchKey) {
+        deleteResume(doGet(searchKey).getUuid());
         sizeReduction();
     }
 
-    protected Resume doGet(Integer searchKey, String uuid) {
+    protected Resume doGet(Integer searchKey) {
         return getResume(searchKey);
     }
 
