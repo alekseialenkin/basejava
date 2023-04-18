@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public interface Serialization<SK> {
-    void doWrite(Resume r, OutputStream os);
+    void doWrite(Resume r, OutputStream os) ;
 
-    Resume doRead(InputStream is);
+    Resume doRead(InputStream is) ;
 }
