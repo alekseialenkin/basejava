@@ -10,8 +10,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
-public abstract class AbstractPathStorage extends AbstractStorage <Path>{
+public abstract class AbstractPathStorage extends AbstractStorage<Path> {
     private final Path directory;
 
     protected abstract void doWrite(Resume r, OutputStream os) throws IOException;
@@ -37,16 +38,16 @@ public abstract class AbstractPathStorage extends AbstractStorage <Path>{
 
     @Override
     public int size() {
-        String [] file = directory.toFile().list();
-        if (file == null){
-            throw new StorageException("Directory can't be null",directory.getParent().toString());
+        try(Stream<Path> file = Files.list(directory)) {
+            return file.toList().size();
+        } catch (IOException e) {
+            throw new StorageException("Directory can't be null", directory.getParent().toString());
         }
-        return file.length;
     }
 
     @Override
     protected Path getSearchKey(String uuid) {
-        return Paths.get(directory.toString());
+        return directory.resolve(uuid);
     }
 
     @Override
@@ -68,7 +69,7 @@ public abstract class AbstractPathStorage extends AbstractStorage <Path>{
         try {
             Files.createFile(path);
         } catch (IOException e) {
-            throw new StorageException("Couldn't create Path " + path.getRoot(),path.getFileName().toString() , e);
+            throw new StorageException("Couldn't create Path " + path.getRoot(), path.getFileName().toString(), e);
         }
         doUpdate(path, r);
     }
@@ -83,28 +84,27 @@ public abstract class AbstractPathStorage extends AbstractStorage <Path>{
     }
 
     @Override
-    protected void doDelete(Path path)  {
+    protected void doDelete(Path path) {
         try {
+            Files.deleteIfExists(path);
             if (!Files.deleteIfExists(path)) {
                 throw new StorageException("Path delete error", path.getParent().toString());
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new StorageException("Directory can't be null", directory.getParent().toString());
         }
     }
 
     @Override
-    protected List<Resume> doGetAll()  {
-        Path[] paths;
-        try {
-            paths = (Path[]) Files.list(directory).toArray();
+    protected List<Resume> doGetAll() {
+        try(Stream<Path> paths = Files.list(directory)) {
+            List<Resume> list = new ArrayList<>(paths.toList().size());
+            for (Path path : paths.toList()) {
+                list.add(doGet(path));
+            }
+            return list;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new StorageException("Directory can't be null", directory.getParent().toString());
         }
-        List<Resume> list = new ArrayList<>(paths.length);
-        for (Path path : paths) {
-            list.add(doGet(path));
-        }
-        return list;
     }
 }
