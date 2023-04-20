@@ -12,7 +12,7 @@ import java.util.Objects;
 public class ObjectFileStreamStorage extends AbstractStorage<File> implements Serialization {
     private File directory;
 
-    protected ObjectFileStreamStorage(File directory) {
+    public ObjectFileStreamStorage(File directory) {
         Objects.requireNonNull(directory, "directory must not be null");
         if (!directory.isDirectory()) {
             throw new IllegalArgumentException(directory.getAbsolutePath() + " is not directory");

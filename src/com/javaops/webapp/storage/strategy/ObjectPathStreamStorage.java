@@ -15,7 +15,7 @@ import java.util.Objects;
 public class ObjectPathStreamStorage extends AbstractStorage<Path> implements Serialization{
     private final Path directory;
 
-    protected ObjectPathStreamStorage(String dir) {
+    public ObjectPathStreamStorage(String dir) {
         directory = Paths.get(dir);
         Objects.requireNonNull(directory, "directory must not be null");
         if (!Files.isDirectory(directory) || !Files.isWritable(directory)) {

@@ -1,30 +1,12 @@
 package com.javaops.webapp.storage;
 
-import com.javaops.webapp.exception.StorageException;
-import com.javaops.webapp.model.Resume;
+import com.javaops.webapp.storage.strategy.ObjectFileStreamStorage;
+import com.javaops.webapp.storage.strategy.Strategy;
 
-import java.io.*;
+import java.io.File;
 
-public class ObjectStreamFileStorage extends AbstractFileStorage implements Serializable {
-
-    protected ObjectStreamFileStorage(File directory) {
-        super(directory);
-    }
-
-    @Override
-    protected Resume doRead(InputStream file) throws IOException {
-        try (ObjectInputStream is = new ObjectInputStream(file)) {
-            return (Resume) is.readObject();
-        } catch (ClassNotFoundException e) {
-            throw new StorageException("Error read", null, e);
-        }
-    }
-
-    @Override
-    protected void doWrite(Resume r, OutputStream os) throws IOException {
-        try (ObjectOutputStream outputStream = new ObjectOutputStream(os)) {
-            outputStream.writeObject(r);
-        }
-    }
+public class ObjectStreamFileStorage {
+    private  File directory;
+    Strategy st = new Strategy(new ObjectFileStreamStorage(directory));
 
 }
