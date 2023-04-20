@@ -1,7 +1,8 @@
-package com.javaops.webapp.storage;
+package com.javaops.webapp.storage.strategy;
 
 import com.javaops.webapp.exception.StorageException;
 import com.javaops.webapp.model.Resume;
+import com.javaops.webapp.storage.AbstractStorage;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -11,14 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class AbstractPathStorage extends AbstractStorage <Path>{
+public class ObjectPathStreamStorage extends AbstractStorage<Path> implements Serialization{
     private final Path directory;
 
-    protected abstract void doWrite(Resume r, OutputStream os) throws IOException;
-
-    protected abstract Resume doRead(InputStream is) throws IOException;
-
-    protected AbstractPathStorage(String dir) {
+    protected ObjectPathStreamStorage(String dir) {
         directory = Paths.get(dir);
         Objects.requireNonNull(directory, "directory must not be null");
         if (!Files.isDirectory(directory) || !Files.isWritable(directory)) {
@@ -106,5 +103,24 @@ public abstract class AbstractPathStorage extends AbstractStorage <Path>{
             list.add(doGet(path));
         }
         return list;
+    }
+    @Override
+    public void doWrite(Resume r, OutputStream os) {
+        try (ObjectOutputStream outputStream = new ObjectOutputStream(os)) {
+            outputStream.writeObject(r);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Resume doRead(InputStream is) {
+        try (ObjectInputStream ois = new ObjectInputStream(is)) {
+            return (Resume) ois.readObject();
+        } catch (ClassNotFoundException e) {
+            throw new StorageException("Error read", null, e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
