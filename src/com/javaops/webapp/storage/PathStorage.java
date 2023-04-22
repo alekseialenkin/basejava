@@ -1,10 +1,13 @@
-package com.javaops.webapp.storage.strategy;
+package com.javaops.webapp.storage;
 
 import com.javaops.webapp.exception.StorageException;
 import com.javaops.webapp.model.Resume;
-import com.javaops.webapp.storage.AbstractStorage;
+import com.javaops.webapp.storage.strategy.ObjectStream;
+import com.javaops.webapp.storage.strategy.Serialization;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,10 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ObjectPathStreamStorage extends AbstractStorage<Path> implements Serialization{
+public class PathStorage extends AbstractStorage<Path>{
     private final Path directory;
+    private final static Serialization STRATEGY = new ObjectStream();
 
-    public ObjectPathStreamStorage(String dir) {
+    public PathStorage(String dir) {
         directory = Paths.get(dir);
         Objects.requireNonNull(directory, "directory must not be null");
         if (!Files.isDirectory(directory) || !Files.isWritable(directory)) {
@@ -43,13 +47,13 @@ public class ObjectPathStreamStorage extends AbstractStorage<Path> implements Se
 
     @Override
     protected Path getSearchKey(String uuid) {
-        return Paths.get(directory.toString());
+        return directory.resolve(uuid);
     }
 
     @Override
     protected void doUpdate(Path path, Resume r) {
         try {
-            doWrite(r, new BufferedOutputStream(Files.newOutputStream(path)));
+            STRATEGY.doWrite(r, new BufferedOutputStream(Files.newOutputStream(path)));
         } catch (IOException e) {
             throw new StorageException("Path write error", r.getUuid(), e);
         }
@@ -73,7 +77,7 @@ public class ObjectPathStreamStorage extends AbstractStorage<Path> implements Se
     @Override
     protected Resume doGet(Path path) {
         try {
-            return doRead(new BufferedInputStream(Files.newInputStream(path)));
+            return STRATEGY.doRead(new BufferedInputStream(Files.newInputStream(path)));
         } catch (IOException e) {
             throw new StorageException("Path read error", path.getRoot().toString(), e);
         }
@@ -82,7 +86,8 @@ public class ObjectPathStreamStorage extends AbstractStorage<Path> implements Se
     @Override
     protected void doDelete(Path path)  {
         try {
-            if (!Files.deleteIfExists(path)) {
+            Files.delete(path);
+            if (Files.deleteIfExists(path)) {
                 throw new StorageException("Path delete error", path.getParent().toString());
             }
         } catch (IOException e) {
@@ -92,35 +97,16 @@ public class ObjectPathStreamStorage extends AbstractStorage<Path> implements Se
 
     @Override
     protected List<Resume> doGetAll()  {
-        Path[] paths;
+        Object[] paths;
         try {
-            paths = (Path[]) Files.list(directory).toArray();
+            paths = Files.list(directory).toArray();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         List<Resume> list = new ArrayList<>(paths.length);
-        for (Path path : paths) {
-            list.add(doGet(path));
+        for (Object path : paths) {
+            list.add(doGet((Path) path));
         }
         return list;
-    }
-    @Override
-    public void doWrite(Resume r, OutputStream os) {
-        try (ObjectOutputStream outputStream = new ObjectOutputStream(os)) {
-            outputStream.writeObject(r);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public Resume doRead(InputStream is) {
-        try (ObjectInputStream ois = new ObjectInputStream(is)) {
-            return (Resume) ois.readObject();
-        } catch (ClassNotFoundException e) {
-            throw new StorageException("Error read", null, e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

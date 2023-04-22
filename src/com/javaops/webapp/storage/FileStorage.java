@@ -1,18 +1,20 @@
-package com.javaops.webapp.storage.strategy;
+package com.javaops.webapp.storage;
 
 import com.javaops.webapp.exception.StorageException;
 import com.javaops.webapp.model.Resume;
-import com.javaops.webapp.storage.AbstractStorage;
+import com.javaops.webapp.storage.strategy.ObjectStream;
+import com.javaops.webapp.storage.strategy.Serialization;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ObjectFileStreamStorage extends AbstractStorage<File> implements Serialization {
-    private File directory;
+public class FileStorage extends AbstractStorage<File>{
+    private final File directory;
+    private static final Serialization STRATEGY = new ObjectStream();
 
-    public ObjectFileStreamStorage(File directory) {
+    public FileStorage(File directory) {
         Objects.requireNonNull(directory, "directory must not be null");
         if (!directory.isDirectory()) {
             throw new IllegalArgumentException(directory.getAbsolutePath() + " is not directory");
@@ -67,7 +69,7 @@ public class ObjectFileStreamStorage extends AbstractStorage<File> implements Se
     protected Resume doGet(File file) {
         Resume r;
         try {
-            r = doRead(new BufferedInputStream(new FileInputStream(file)));
+            r = STRATEGY.doRead(new BufferedInputStream(new FileInputStream(file)));
         } catch (IOException e) {
             throw new StorageException("File read error", file.getName(), e);
         }
@@ -78,7 +80,7 @@ public class ObjectFileStreamStorage extends AbstractStorage<File> implements Se
     @Override
     protected void doUpdate(File file, Resume r) {
         try {
-            doWrite(r, new BufferedOutputStream(new FileOutputStream(file)));
+            STRATEGY.doWrite(r, new BufferedOutputStream(new FileOutputStream(file)));
         } catch (IOException e) {
             throw new StorageException("File write error", file.getName(), e);
         }
@@ -105,24 +107,5 @@ public class ObjectFileStreamStorage extends AbstractStorage<File> implements Se
         return listFiles.length;
 
     }
-
-    @Override
-    public void doWrite(Resume r, OutputStream os) {
-        try (ObjectOutputStream outputStream = new ObjectOutputStream(os)) {
-            outputStream.writeObject(r);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public Resume doRead(InputStream is) {
-        try (ObjectInputStream ois = new ObjectInputStream(is)) {
-            return (Resume) ois.readObject();
-        } catch (ClassNotFoundException e) {
-            throw new StorageException("Error read", null, e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    
 }
