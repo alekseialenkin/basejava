@@ -1,7 +1,13 @@
 package com.javaops.webapp.model;
 
+import com.google.gson.annotations.JsonAdapter;
 import com.javaops.webapp.util.DateUtil;
+import com.javaops.webapp.util.XmlLocalDateAdapter;
+import com.javaops.webapp.util.JsonLocalDateAdapter;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -12,11 +18,15 @@ import java.util.Objects;
 
 import static com.javaops.webapp.util.DateUtil.NOW;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Company implements Serializable {
     @Serial
-    private static final long serialVersionUID =1L;
-    private final Link website;
-    private final List<Period> periods;
+    private static final long serialVersionUID = 1L;
+    private Link website;
+    private List<Period> periods;
+
+    public Company() {
+    }
 
     public Company(String name, String url, Period... periods) {
         this(new Link(name, url), Arrays.asList(periods));
@@ -58,13 +68,21 @@ public class Company implements Serializable {
         return Objects.hash(website, periods);
     }
 
-    public static class Period implements Serializable{
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class Period implements Serializable {
         @Serial
-        private static final long serialVersionUID =1L;
-        private final LocalDate begin;
-        private final LocalDate end;
-        private final String title;
-        private final String description;
+        private static final long serialVersionUID = 1L;
+        @XmlJavaTypeAdapter(XmlLocalDateAdapter.class)
+        @JsonAdapter(JsonLocalDateAdapter.class)
+        private LocalDate begin;
+        @XmlJavaTypeAdapter(XmlLocalDateAdapter.class)
+        @JsonAdapter(JsonLocalDateAdapter.class)
+        private LocalDate end;
+        private String title;
+        private String description;
+
+        public Period() {
+        }
 
         public Period(int startYear, Month startMonth, String title, String description) {
             this(DateUtil.of(startYear, startMonth), NOW, title, description);

@@ -2,7 +2,6 @@ package com.javaops.webapp.storage;
 
 import com.javaops.webapp.exception.StorageException;
 import com.javaops.webapp.model.Resume;
-import com.javaops.webapp.storage.strategy.ObjectStream;
 import com.javaops.webapp.storage.strategy.Serialization;
 
 import java.io.*;
@@ -10,11 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class FileStorage extends AbstractStorage<File>{
+public class FileStorage extends AbstractStorage<File> {
     private final File directory;
-    private static final Serialization STRATEGY = new ObjectStream();
+    private static Serialization strategy;
 
-    public FileStorage(File directory) {
+    public FileStorage(File directory, Serialization str) {
         Objects.requireNonNull(directory, "directory must not be null");
         if (!directory.isDirectory()) {
             throw new IllegalArgumentException(directory.getAbsolutePath() + " is not directory");
@@ -23,6 +22,7 @@ public class FileStorage extends AbstractStorage<File>{
             throw new IllegalArgumentException(directory.getAbsolutePath() + " is not readable/writable");
         }
         this.directory = directory;
+        strategy = str;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class FileStorage extends AbstractStorage<File>{
     protected Resume doGet(File file) {
         Resume r;
         try {
-            r = STRATEGY.doRead(new BufferedInputStream(new FileInputStream(file)));
+            r = strategy.doRead(new BufferedInputStream(new FileInputStream(file)));
         } catch (IOException e) {
             throw new StorageException("File read error", file.getName(), e);
         }
@@ -80,7 +80,7 @@ public class FileStorage extends AbstractStorage<File>{
     @Override
     protected void doUpdate(File file, Resume r) {
         try {
-            STRATEGY.doWrite(r, new BufferedOutputStream(new FileOutputStream(file)));
+            strategy.doWrite(r, new BufferedOutputStream(new FileOutputStream(file)));
         } catch (IOException e) {
             throw new StorageException("File write error", file.getName(), e);
         }
@@ -107,5 +107,5 @@ public class FileStorage extends AbstractStorage<File>{
         return listFiles.length;
 
     }
-    
+
 }

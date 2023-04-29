@@ -2,7 +2,6 @@ package com.javaops.webapp.storage;
 
 import com.javaops.webapp.exception.StorageException;
 import com.javaops.webapp.model.Resume;
-import com.javaops.webapp.storage.strategy.ObjectStream;
 import com.javaops.webapp.storage.strategy.Serialization;
 
 import java.io.BufferedInputStream;
@@ -17,14 +16,15 @@ import java.util.Objects;
 
 public class PathStorage extends AbstractStorage<Path>{
     private final Path directory;
-    private final static Serialization STRATEGY = new ObjectStream();
+    private static  Serialization strategy;
 
-    public PathStorage(String dir) {
+    public PathStorage(String dir, Serialization str) {
         directory = Paths.get(dir);
         Objects.requireNonNull(directory, "directory must not be null");
         if (!Files.isDirectory(directory) || !Files.isWritable(directory)) {
             throw new IllegalArgumentException(dir + " is not directory or is not writable");
         }
+        strategy = str;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class PathStorage extends AbstractStorage<Path>{
     @Override
     protected void doUpdate(Path path, Resume r) {
         try {
-            STRATEGY.doWrite(r, new BufferedOutputStream(Files.newOutputStream(path)));
+            strategy.doWrite(r, new BufferedOutputStream(Files.newOutputStream(path)));
         } catch (IOException e) {
             throw new StorageException("Path write error", r.getUuid(), e);
         }
@@ -77,7 +77,7 @@ public class PathStorage extends AbstractStorage<Path>{
     @Override
     protected Resume doGet(Path path) {
         try {
-            return STRATEGY.doRead(new BufferedInputStream(Files.newInputStream(path)));
+            return strategy.doRead(new BufferedInputStream(Files.newInputStream(path)));
         } catch (IOException e) {
             throw new StorageException("Path read error", path.getRoot().toString(), e);
         }
