@@ -1,9 +1,11 @@
 package com.javaops.webapp.storage.strategy;
 
 import com.javaops.webapp.model.*;
+import com.javaops.webapp.util.DateUtil;
 
 import javax.xml.crypto.Data;
 import java.io.*;
+import java.time.LocalDate;
 import java.time.Month;
 import java.util.Map;
 
@@ -40,22 +42,12 @@ public class DataStreamSerializer implements Serialization<Data> {
                         CompanySection cs = (CompanySection) entry.getValue();
                         for (Company c : cs.getCompanies()) {
                             dos.writeUTF(c.getWebsite().getName());
-                            if (c.getWebsite().getUrl() != null) {
-                                dos.writeUTF(c.getWebsite().getUrl());
-                            } else {
-                                dos.writeUTF("null");
-                            }
+                            dos.writeUTF((c.getWebsite().getUrl() != null) ? c.getWebsite().getUrl() : "null");
                             for (Company.Period p : c.getPeriods()) {
                                 dos.writeUTF(p.getTitle());
-                                if (p.getDescription() != null){
-                                dos.writeUTF(p.getDescription());}
-                                else {dos.writeUTF("null");}
-                                dos.write(p.getBegin().getDayOfMonth());
-                                dos.write(p.getBegin().getMonth().getValue());
-                                dos.write(p.getBegin().getYear());
-                                dos.write(p.getEnd().getDayOfMonth());
-                                dos.write(p.getEnd().getMonth().getValue());
-                                dos.write(p.getEnd().getYear());
+                                dos.writeUTF((p.getDescription() != null) ? p.getDescription() : "null");
+                                writeData(p.getBegin(),dos);
+                                writeData(p.getEnd(),dos);
                             }
                         }
                     }
@@ -63,7 +55,6 @@ public class DataStreamSerializer implements Serialization<Data> {
             }
         }
     }
-
     @Override
     public Resume doRead(InputStream is) throws IOException {
         try (DataInputStream dis = new DataInputStream(is)) {
@@ -82,13 +73,20 @@ public class DataStreamSerializer implements Serialization<Data> {
                     case ACHIEVEMENT -> resume.addSection(SectionType.ACHIEVEMENT, new ListSection(dis.readUTF()));
                     case QUALIFICATIONS ->
                             resume.addSection(SectionType.QUALIFICATIONS, new ListSection(dis.readUTF()));
-                    case EXPERIENCE ->
-                            resume.addSection(SectionType.EXPERIENCE, new CompanySection(new Company(dis.readUTF(), dis.readUTF(), new Company.Period(dis.readInt(), Month.of(dis.readInt()), dis.readInt(), Month.of(dis.readInt()), dis.readUTF(), dis.readUTF()))));
-                    case EDUCATION ->
-                            resume.addSection(SectionType.EDUCATION, new CompanySection(new Company(dis.readUTF(), dis.readUTF(), new Company.Period(dis.readInt(), Month.of(dis.readInt()), dis.readInt(), Month.of(dis.readInt()), dis.readUTF(), dis.readUTF()))));
+                    case EXPERIENCE, EDUCATION ->
+                            resume.addSection(SectionType.EXPERIENCE, new CompanySection(new Company(dis.readUTF(), dis.readUTF(),
+                                    new Company.Period(readData(dis.readInt(),Month.of(dis.readInt())), readData(dis.readInt(),Month.of(dis.readInt())), dis.readUTF(), dis.readUTF()))));
                 }
             }
             return resume;
         }
+    }
+    private static void writeData(LocalDate date, DataOutputStream dos) throws IOException {
+        dos.write(date.getYear());
+        dos.write(date.getDayOfMonth());
+        dos.write(date.getMonth().getValue());
+    }
+    private static LocalDate readData(int year,Month month){
+        return DateUtil.of(year,month);
     }
 }
