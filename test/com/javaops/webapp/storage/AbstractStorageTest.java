@@ -80,7 +80,7 @@ public abstract class AbstractStorageTest {
     public void update() throws Exception {
         Resume newResume = new Resume(UUID_2,FULLNAME_2);
         storage.update(newResume);
-        Assertions.assertSame(newResume, storage.get(r2));
+        Assertions.assertEquals(newResume, storage.get(r2));
     }
 
     @Test
@@ -113,9 +113,9 @@ public abstract class AbstractStorageTest {
 
     @Test
     public void get() throws Exception {
-        assertGet(r1);
         assertGet(r2);
         assertGet(r3);
+        assertGet(r1);
     }
 
     @Test

@@ -7,6 +7,8 @@ import javax.xml.crypto.Data;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class DataStreamSerializer implements Serialization<Data> {
@@ -34,20 +36,23 @@ public class DataStreamSerializer implements Serialization<Data> {
                     }
                     case ACHIEVEMENT, QUALIFICATIONS -> {
                         ListSection lst = (ListSection) entry.getValue();
+                        dos.writeInt(lst.getStrings().size());
                         for (String s : lst.getStrings()) {
                             dos.writeUTF(s);
                         }
                     }
                     case EXPERIENCE, EDUCATION -> {
                         CompanySection cs = (CompanySection) entry.getValue();
+                        dos.writeInt(cs.getCompanies().size());
                         for (Company c : cs.getCompanies()) {
                             dos.writeUTF(c.getWebsite().getName());
                             dos.writeUTF((c.getWebsite().getUrl() != null) ? c.getWebsite().getUrl() : "null");
+                            dos.writeInt(c.getPeriods().size());
                             for (Company.Period p : c.getPeriods()) {
                                 dos.writeUTF(p.getTitle());
                                 dos.writeUTF((p.getDescription() != null) ? p.getDescription() : "null");
-                                writeData(p.getBegin(),dos);
-                                writeData(p.getEnd(),dos);
+                                writeData(p.getBegin(), dos);
+                                writeData(p.getEnd(), dos);
                             }
                         }
                     }
@@ -55,6 +60,7 @@ public class DataStreamSerializer implements Serialization<Data> {
             }
         }
     }
+
     @Override
     public Resume doRead(InputStream is) throws IOException {
         try (DataInputStream dis = new DataInputStream(is)) {
@@ -65,28 +71,65 @@ public class DataStreamSerializer implements Serialization<Data> {
             for (int i = 0; i < size; i++) {
                 resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF());
             }
-            for (int i = size + 1; i < size; i++) {
+            size = dis.readInt();
+            for (int i = 0; i < size; i++) {
                 SectionType type = SectionType.valueOf(dis.readUTF());
                 switch (type) {
                     case PERSONAL -> resume.addSection(SectionType.PERSONAL, new TextSection(dis.readUTF()));
                     case OBJECTIVE -> resume.addSection(SectionType.OBJECTIVE, new TextSection(dis.readUTF()));
-                    case ACHIEVEMENT -> resume.addSection(SectionType.ACHIEVEMENT, new ListSection(dis.readUTF()));
-                    case QUALIFICATIONS ->
-                            resume.addSection(SectionType.QUALIFICATIONS, new ListSection(dis.readUTF()));
-                    case EXPERIENCE, EDUCATION ->
-                            resume.addSection(SectionType.EXPERIENCE, new CompanySection(new Company(dis.readUTF(), dis.readUTF(),
-                                    new Company.Period(readData(dis.readInt(),Month.of(dis.readInt())), readData(dis.readInt(),Month.of(dis.readInt())), dis.readUTF(), dis.readUTF()))));
+                    case ACHIEVEMENT -> {
+                        int size1 = dis.readInt();
+                        List<String> list = new ArrayList<>(size1);
+                        for (int k = 0; k < size1; k++) {
+                            list.add(dis.readUTF());
+                        }
+                        resume.addSection(SectionType.ACHIEVEMENT, new ListSection(list));
+                    }
+                    case QUALIFICATIONS -> {
+                        int size1 = dis.readInt();
+                        List<String> list = new ArrayList<>(size1);
+                        for (int k = 0; k < size1; k++) {
+                            list.add(dis.readUTF());
+                        }
+                        resume.addSection(SectionType.QUALIFICATIONS, new ListSection(list));
+                    }
+                    case EXPERIENCE -> {
+                        int size1 = dis.readInt();
+                        List<Company> list1 = new ArrayList<>(size1);
+                        for (int k = 0; k < size1; k++) {
+                            list1.add(new Company(new Link(dis.readUTF(),dis.readUTF()),getList(dis)));
+                        }
+                        resume.addSection(SectionType.EXPERIENCE, new CompanySection(list1));
+                    }
+                    case EDUCATION -> {
+                        int size1 = dis.readInt();
+                        List<Company> list1 = new ArrayList<>(size1);
+                        for (int k = 0; k < size1; k++) {
+                            list1.add(new Company(new Link(dis.readUTF(),dis.readUTF()),getList(dis)));
+                        }
+                        resume.addSection(SectionType.EDUCATION, new CompanySection(list1));
+                    }
                 }
             }
             return resume;
         }
+    }
+    private static List<Company.Period> getList(DataInputStream dis) throws IOException {
+        int size2 = dis.readInt();
+        List<Company.Period> periods = new ArrayList<>();
+        for (int j = 0; j < size2;j++){
+            Company.Period p = new Company.Period(readData(dis.readInt(), Month.of(dis.readInt())), readData(dis.readInt(), Month.of(dis.readInt())), dis.readUTF(), dis.readUTF());
+            periods.add(p);
+        }
+        return periods;
     }
     private static void writeData(LocalDate date, DataOutputStream dos) throws IOException {
         dos.write(date.getYear());
         dos.write(date.getDayOfMonth());
         dos.write(date.getMonth().getValue());
     }
-    private static LocalDate readData(int year,Month month){
-        return DateUtil.of(year,month);
+
+    private static LocalDate readData(int year, Month month) {
+        return DateUtil.of(year, month);
     }
 }
