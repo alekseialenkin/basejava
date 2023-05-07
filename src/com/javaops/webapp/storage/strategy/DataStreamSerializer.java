@@ -1,12 +1,10 @@
 package com.javaops.webapp.storage.strategy;
 
 import com.javaops.webapp.model.*;
-import com.javaops.webapp.util.DateUtil;
 
 import javax.xml.crypto.Data;
 import java.io.*;
 import java.time.LocalDate;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,10 +47,10 @@ public class DataStreamSerializer implements Serialization<Data> {
                             dos.writeUTF((c.getWebsite().getUrl() != null) ? c.getWebsite().getUrl() : "null");
                             dos.writeInt(c.getPeriods().size());
                             for (Company.Period p : c.getPeriods()) {
-                                dos.writeUTF(p.getTitle());
-                                dos.writeUTF((p.getDescription() != null) ? p.getDescription() : "null");
                                 writeData(p.getBegin(), dos);
                                 writeData(p.getEnd(), dos);
+                                dos.writeUTF(p.getTitle());
+                                dos.writeUTF((p.getDescription() != null) ? p.getDescription() : "null");
                             }
                         }
                     }
@@ -118,18 +116,17 @@ public class DataStreamSerializer implements Serialization<Data> {
         int size2 = dis.readInt();
         List<Company.Period> periods = new ArrayList<>();
         for (int j = 0; j < size2;j++){
-            Company.Period p = new Company.Period(readData(dis.readInt(), Month.of(dis.readInt())), readData(dis.readInt(), Month.of(dis.readInt())), dis.readUTF(), dis.readUTF());
+            Company.Period p = new Company.Period(readData(dis), readData(dis), dis.readUTF(), dis.readUTF());
             periods.add(p);
         }
         return periods;
     }
     private static void writeData(LocalDate date, DataOutputStream dos) throws IOException {
-        dos.write(date.getYear());
-        dos.write(date.getDayOfMonth());
-        dos.write(date.getMonth().getValue());
+        dos.writeInt(date.getYear());
+        dos.writeInt(date.getMonth().getValue());
     }
 
-    private static LocalDate readData(int year, Month month) {
-        return DateUtil.of(year, month);
+    private static LocalDate readData(DataInputStream dis) throws IOException {
+        return LocalDate.of(dis.readInt(), dis.readInt(),1);
     }
 }
