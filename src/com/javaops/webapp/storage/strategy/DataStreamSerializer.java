@@ -79,7 +79,7 @@ public class DataStreamSerializer implements Serialization<Data> {
                         int size1 = dis.readInt();
                         List<String> list = new ArrayList<>(size1);
                         for (int k = 0; k < size1; k++) {
-                            list.add(dis.readUTF());
+                            list.add(isNull(dis.readUTF()));
                         }
                         resume.addSection(SectionType.ACHIEVEMENT, new ListSection(list));
                     }
@@ -87,7 +87,7 @@ public class DataStreamSerializer implements Serialization<Data> {
                         int size1 = dis.readInt();
                         List<String> list = new ArrayList<>(size1);
                         for (int k = 0; k < size1; k++) {
-                            list.add(dis.readUTF());
+                            list.add(isNull(dis.readUTF()));
                         }
                         resume.addSection(SectionType.QUALIFICATIONS, new ListSection(list));
                     }
@@ -95,7 +95,7 @@ public class DataStreamSerializer implements Serialization<Data> {
                         int size1 = dis.readInt();
                         List<Company> list1 = new ArrayList<>(size1);
                         for (int k = 0; k < size1; k++) {
-                            list1.add(new Company(new Link(dis.readUTF(),dis.readUTF()),getList(dis)));
+                            list1.add(new Company(new Link(isNull(dis.readUTF()),isNull(dis.readUTF())),getList(dis)));
                         }
                         resume.addSection(SectionType.EXPERIENCE, new CompanySection(list1));
                     }
@@ -103,7 +103,7 @@ public class DataStreamSerializer implements Serialization<Data> {
                         int size1 = dis.readInt();
                         List<Company> list1 = new ArrayList<>(size1);
                         for (int k = 0; k < size1; k++) {
-                            list1.add(new Company(new Link(dis.readUTF(),dis.readUTF()),getList(dis)));
+                            list1.add(new Company(new Link(isNull(dis.readUTF()),isNull(dis.readUTF())),getList(dis)));
                         }
                         resume.addSection(SectionType.EDUCATION, new CompanySection(list1));
                     }
@@ -112,11 +112,15 @@ public class DataStreamSerializer implements Serialization<Data> {
             return resume;
         }
     }
+    private static String isNull(String s){
+        if (s.equals("null")) return null;
+        return s;
+    }
     private static List<Company.Period> getList(DataInputStream dis) throws IOException {
         int size2 = dis.readInt();
         List<Company.Period> periods = new ArrayList<>();
         for (int j = 0; j < size2;j++){
-            Company.Period p = new Company.Period(readData(dis), readData(dis), dis.readUTF(), dis.readUTF());
+            Company.Period p = new Company.Period(readData(dis), readData(dis), isNull(dis.readUTF()), isNull(dis.readUTF()));
             periods.add(p);
         }
         return periods;
@@ -124,9 +128,10 @@ public class DataStreamSerializer implements Serialization<Data> {
     private static void writeData(LocalDate date, DataOutputStream dos) throws IOException {
         dos.writeInt(date.getYear());
         dos.writeInt(date.getMonth().getValue());
+        dos.writeInt(date.getDayOfMonth());
     }
 
     private static LocalDate readData(DataInputStream dis) throws IOException {
-        return LocalDate.of(dis.readInt(), dis.readInt(),1);
+        return LocalDate.of(dis.readInt(), dis.readInt(), dis.readInt());
     }
 }
