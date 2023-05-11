@@ -56,24 +56,20 @@ public class DataStreamSerializer implements Serialization<Data> {
             String uuid = dis.readUTF();
             String fullName = dis.readUTF();
             Resume resume = new Resume(uuid, fullName);
-            int size = dis.readInt();
-            for (int i = 0; i < size; i++) {
-                resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF());
-            }
-            size = dis.readInt();
-            for (int i = 0; i < size; i++) {
+            readWithException(dis,()->resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF()));
+            readWithException(dis,()-> {
                 SectionType type = SectionType.valueOf(dis.readUTF());
                 switch (type) {
                     case PERSONAL, OBJECTIVE -> resume.addSection(type, new TextSection(checkNull(dis.readUTF())));
                     case ACHIEVEMENT, QUALIFICATIONS -> {
-                        resume.addSection(type, new ListSection(readWithException(dis, () -> checkNull(dis.readUTF()))));
+                        resume.addSection(type, new ListSection(getSectionList(dis, () -> checkNull(dis.readUTF()))));
                     }
                     case EXPERIENCE, EDUCATION -> {
-                        resume.addSection(type, new CompanySection(readWithException(dis, () -> new Company(new Link(checkNull(dis.readUTF()), checkNull(dis.readUTF())), readWithException(dis,
+                        resume.addSection(type, new CompanySection(getSectionList(dis, () -> new Company(new Link(checkNull(dis.readUTF()), checkNull(dis.readUTF())), getSectionList(dis,
                                 () -> new Company.Period(readData(dis), readData(dis), checkNull(dis.readUTF()), checkNull(dis.readUTF())))))));
                     }
                 }
-            }
+            });
             return resume;
         }
     }
@@ -99,7 +95,7 @@ public class DataStreamSerializer implements Serialization<Data> {
         }
     }
 
-    private <T> List<T> readWithException(DataInputStream dis, CustomConsumerReader<T> reader) throws IOException {
+    private <T> List<T> getSectionList(DataInputStream dis, CustomConsumerReader<T> reader) throws IOException {
         int size = dis.readInt();
         List<T> list = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
@@ -107,7 +103,16 @@ public class DataStreamSerializer implements Serialization<Data> {
         }
         return list;
     }
-
+    private void readWithException(DataInputStream dis, Action action) throws IOException{
+        int size = dis.readInt();
+        for (int i = 0; i < size; i++) {
+            action.make();
+        }
+    }
+    @FunctionalInterface
+    interface Action {
+        void make() throws IOException;
+    }
     @FunctionalInterface
     interface CustomConsumerWriter<T> {
         void write(T t) throws IOException;
