@@ -23,24 +23,21 @@ public class DataStreamSerializer implements Serialization<Data> {
                 dos.writeUTF(entry.getKey().name());
                 dos.writeUTF(entry.getValue());
             });
-            writeWithException(section.entrySet(),dos,(Map.Entry<SectionType, AbstractSection> entry)->{
+            writeWithException(section.entrySet(), dos, (Map.Entry<SectionType, AbstractSection> entry) -> {
                 dos.writeUTF(entry.getKey().name());
                 SectionType type = entry.getKey();
                 switch (type) {
                     case PERSONAL, OBJECTIVE -> {
-                        TextSection text = (TextSection) entry.getValue();
-                        dos.writeUTF(text.getText());
+                        dos.writeUTF(((TextSection) entry.getValue()).getText());
                     }
                     case ACHIEVEMENT, QUALIFICATIONS -> {
-                        ListSection lst = (ListSection) entry.getValue();
-                        writeWithException(lst.getStrings(), dos, dos::writeUTF);
+                        writeWithException(((ListSection) entry.getValue()).getStrings(), dos, dos::writeUTF);
                     }
                     case EXPERIENCE, EDUCATION -> {
-                        CompanySection cs = (CompanySection) entry.getValue();
-                        writeWithException(cs.getCompanies(),dos,(company)->{
+                        writeWithException(((CompanySection) entry.getValue()).getCompanies(), dos, (company) -> {
                             dos.writeUTF(company.getWebsite().getName());
                             dos.writeUTF((company.getWebsite().getUrl() != null) ? company.getWebsite().getUrl() : "null");
-                            writeWithException(company.getPeriods(),dos,(period)->{
+                            writeWithException(company.getPeriods(), dos, (period) -> {
                                 writeData(period.getBegin(), dos);
                                 writeData(period.getEnd(), dos);
                                 dos.writeUTF(period.getTitle());
@@ -67,22 +64,13 @@ public class DataStreamSerializer implements Serialization<Data> {
             for (int i = 0; i < size; i++) {
                 SectionType type = SectionType.valueOf(dis.readUTF());
                 switch (type) {
-                    case PERSONAL, OBJECTIVE -> resume.addSection(type, new TextSection(dis.readUTF()));
+                    case PERSONAL, OBJECTIVE -> resume.addSection(type, new TextSection(checkNull(dis.readUTF())));
                     case ACHIEVEMENT, QUALIFICATIONS -> {
-                        int size1 = dis.readInt();
-                        List<String> list = new ArrayList<>(size1);
-                        for (int k = 0; k < size1; k++) {
-                            list.add(checkNull(dis.readUTF()));
-                        }
-                        resume.addSection(type, new ListSection(list));
+                        resume.addSection(type, new ListSection(readWithException(dis, () -> checkNull(dis.readUTF()))));
                     }
                     case EXPERIENCE, EDUCATION -> {
-                        int size1 = dis.readInt();
-                        List<Company> list1 = new ArrayList<>(size1);
-                        for (int k = 0; k < size1; k++) {
-                            list1.add(new Company(new Link(checkNull(dis.readUTF()), checkNull(dis.readUTF())), getPeriods(dis)));
-                        }
-                        resume.addSection(type, new CompanySection(list1));
+                        resume.addSection(type, new CompanySection(readWithException(dis, () -> new Company(new Link(checkNull(dis.readUTF()), checkNull(dis.readUTF())), readWithException(dis,
+                                () -> new Company.Period(readData(dis), readData(dis), checkNull(dis.readUTF()), checkNull(dis.readUTF())))))));
                     }
                 }
             }
@@ -94,35 +82,40 @@ public class DataStreamSerializer implements Serialization<Data> {
         return s.equals("null") ? null : s;
     }
 
-    private List<Company.Period> getPeriods(DataInputStream dis) throws IOException {
-        int size2 = dis.readInt();
-        List<Company.Period> periods = new ArrayList<>();
-        for (int j = 0; j < size2; j++) {
-            Company.Period p = new Company.Period(readData(dis), readData(dis), checkNull(dis.readUTF()), checkNull(dis.readUTF()));
-            periods.add(p);
-        }
-        return periods;
-    }
-
     private void writeData(LocalDate date, DataOutputStream dos) throws IOException {
         dos.writeInt(date.getYear());
         dos.writeInt(date.getMonth().getValue());
         dos.writeInt(date.getDayOfMonth());
     }
 
-    private <T> void writeWithException(Collection<T> collection, DataOutputStream dos, CustomConsumer<T> writer) throws IOException {
+    private LocalDate readData(DataInputStream dis) throws IOException {
+        return LocalDate.of(dis.readInt(), dis.readInt(), dis.readInt());
+    }
+
+    private <T> void writeWithException(Collection<T> collection, DataOutputStream dos, CustomConsumerWriter<T> writer) throws IOException {
         dos.writeInt(collection.size());
         for (T element : collection) {
             writer.write(element);
         }
     }
 
-    private LocalDate readData(DataInputStream dis) throws IOException {
-        return LocalDate.of(dis.readInt(), dis.readInt(), dis.readInt());
+    private <T> List<T> readWithException(DataInputStream dis, CustomConsumerReader<T> reader) throws IOException {
+        int size = dis.readInt();
+        List<T> list = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            list.add(reader.read());
+        }
+        return list;
     }
 
     @FunctionalInterface
-    interface CustomConsumer<T> {
+    interface CustomConsumerWriter<T> {
         void write(T t) throws IOException;
+    }
+
+    @FunctionalInterface
+    interface CustomConsumerReader<T> {
+        T read() throws IOException;
+
     }
 }
