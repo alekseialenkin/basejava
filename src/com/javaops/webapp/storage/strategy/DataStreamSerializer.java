@@ -27,24 +27,19 @@ public class DataStreamSerializer implements Serialization<Data> {
                 dos.writeUTF(entry.getKey().name());
                 SectionType type = entry.getKey();
                 switch (type) {
-                    case PERSONAL, OBJECTIVE -> {
-                        dos.writeUTF(((TextSection) entry.getValue()).getText());
-                    }
-                    case ACHIEVEMENT, QUALIFICATIONS -> {
-                        writeWithException(((ListSection) entry.getValue()).getStrings(), dos, dos::writeUTF);
-                    }
-                    case EXPERIENCE, EDUCATION -> {
-                        writeWithException(((CompanySection) entry.getValue()).getCompanies(), dos, (company) -> {
-                            dos.writeUTF(company.getWebsite().getName());
-                            dos.writeUTF((company.getWebsite().getUrl() != null) ? company.getWebsite().getUrl() : "null");
-                            writeWithException(company.getPeriods(), dos, (period) -> {
-                                writeData(period.getBegin(), dos);
-                                writeData(period.getEnd(), dos);
-                                dos.writeUTF(period.getTitle());
-                                dos.writeUTF((period.getDescription() != null) ? period.getDescription() : "null");
+                    case PERSONAL, OBJECTIVE -> dos.writeUTF(((TextSection) entry.getValue()).getText());
+                    case ACHIEVEMENT, QUALIFICATIONS -> writeWithException(((ListSection) entry.getValue()).getStrings(), dos, dos::writeUTF);
+                    case EXPERIENCE, EDUCATION ->
+                            writeWithException(((CompanySection) entry.getValue()).getCompanies(), dos, (company) -> {
+                                dos.writeUTF(company.getWebsite().getName());
+                                dos.writeUTF((company.getWebsite().getUrl() != null) ? company.getWebsite().getUrl() : "null");
+                                writeWithException(company.getPeriods(), dos, (period) -> {
+                                    writeData(period.getBegin(), dos);
+                                    writeData(period.getEnd(), dos);
+                                    dos.writeUTF(period.getTitle());
+                                    dos.writeUTF((period.getDescription() != null) ? period.getDescription() : "null");
+                                });
                             });
-                        });
-                    }
                 }
             });
         }
@@ -60,14 +55,10 @@ public class DataStreamSerializer implements Serialization<Data> {
             readWithException(dis,()-> {
                 SectionType type = SectionType.valueOf(dis.readUTF());
                 switch (type) {
-                    case PERSONAL, OBJECTIVE -> resume.addSection(type, new TextSection(checkNull(dis.readUTF())));
-                    case ACHIEVEMENT, QUALIFICATIONS -> {
-                        resume.addSection(type, new ListSection(getSectionList(dis, () -> checkNull(dis.readUTF()))));
-                    }
-                    case EXPERIENCE, EDUCATION -> {
-                        resume.addSection(type, new CompanySection(getSectionList(dis, () -> new Company(new Link(checkNull(dis.readUTF()), checkNull(dis.readUTF())), getSectionList(dis,
-                                () -> new Company.Period(readData(dis), readData(dis), checkNull(dis.readUTF()), checkNull(dis.readUTF())))))));
-                    }
+                    case PERSONAL, OBJECTIVE -> resume.addSection(type, new TextSection(dis.readUTF()));
+                    case ACHIEVEMENT, QUALIFICATIONS -> resume.addSection(type, new ListSection(getSectionList(dis, dis::readUTF)));
+                    case EXPERIENCE, EDUCATION -> resume.addSection(type, new CompanySection(getSectionList(dis, () -> new Company(new Link(checkNull(dis.readUTF()), checkNull(dis.readUTF())), getSectionList(dis,
+                            () -> new Company.Period(readData(dis), readData(dis), dis.readUTF(), dis.readUTF()))))));
                 }
             });
             return resume;
