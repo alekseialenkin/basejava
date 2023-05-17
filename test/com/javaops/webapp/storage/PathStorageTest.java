@@ -4,6 +4,6 @@ import com.javaops.webapp.storage.strategy.ObjectStream;
 
 class PathStorageTest extends AbstractStorageTest{
     public PathStorageTest(){
-        super(new PathStorage(STORAGEDIR,new ObjectStream()));
+        super(new PathStorage(STORAGEDIR.getAbsolutePath(),new ObjectStream()));
     }
 }

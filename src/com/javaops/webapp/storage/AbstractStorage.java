@@ -35,7 +35,7 @@ public abstract class AbstractStorage<SK> implements Storage {
         doDelete(getNotExistingSearchKey(r.getUuid()));
     }
 
-    private final static Comparator<Resume> RESUME_COMPARATOR = Comparator.comparing(Resume::getFullName).thenComparing(Resume::getUuid);
+    protected final static Comparator<Resume> RESUME_COMPARATOR = Comparator.comparing(Resume::getFullName).thenComparing(Resume::getUuid);
 
     @Override
     public final List<Resume> getAllSorted() {
