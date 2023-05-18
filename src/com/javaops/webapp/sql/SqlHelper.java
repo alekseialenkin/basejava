@@ -7,12 +7,15 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class SqlHelper<T> {
-    private final String sqlCommand;
+    private  String sqlCommand;
     private final ConnectionFactory connectionFactory;
 
-    public SqlHelper(String sqlCommand, ConnectionFactory connectionFactory) {
-        this.sqlCommand = sqlCommand;
+    public SqlHelper(ConnectionFactory connectionFactory) {
         this.connectionFactory = connectionFactory;
+    }
+
+    public void setSqlCommand(String sqlCommand) {
+        this.sqlCommand = sqlCommand;
     }
 
     public String getSqlCommand() {
@@ -28,4 +31,5 @@ public class SqlHelper<T> {
             throw new StorageException(e);
         }
     }
+
 }
