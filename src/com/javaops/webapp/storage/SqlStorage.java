@@ -1,11 +1,14 @@
 package com.javaops.webapp.storage;
 
+import com.javaops.webapp.exception.ExistStorageException;
 import com.javaops.webapp.exception.NotExistStorageException;
+import com.javaops.webapp.exception.StorageException;
 import com.javaops.webapp.model.Resume;
 import com.javaops.webapp.sql.SqlHelper;
 
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -18,12 +21,10 @@ public class SqlStorage implements Storage {
         sqlHelper = new SqlHelper<>(() -> DriverManager.getConnection(dbUrl, dbUser, dbPassword));
     }
 
-
     @Override
     public void clear() {
         LOG.info("Clear");
-        sqlHelper.setSqlCommand("DELETE from RESUME");
-        sqlHelper.make((helper) -> {
+        sqlHelper.make("DELETE from RESUME", (helper) -> {
             helper.execute();
             return null;
         });
@@ -32,12 +33,13 @@ public class SqlStorage implements Storage {
     @Override
     public void update(Resume r) {
         LOG.info("Update " + r);
-        sqlHelper.setSqlCommand("UPDATE resume SET uuid = ?, full_name = ? WHERE uuid = ? ");
-        sqlHelper.make((helper) -> {
+        sqlHelper.make("UPDATE resume SET uuid = ?, full_name = ? WHERE uuid = ? ", (helper) -> {
             helper.setString(1, r.getUuid());
             helper.setString(2, r.getFullName());
             helper.setString(3, r.getUuid());
-            helper.execute();
+            if (helper.executeUpdate() == 0) {
+                throw new NotExistStorageException(r.getUuid());
+            }
             return null;
         });
     }
@@ -45,20 +47,27 @@ public class SqlStorage implements Storage {
     @Override
     public void save(Resume r) {
         LOG.info("Save " + r);
-        sqlHelper.setSqlCommand("INSERT INTO resume(UUID, FULL_NAME) VALUES (?,?)");
-        sqlHelper.make((helper) -> {
-            helper.setString(1, r.getUuid());
-            helper.setString(2, r.getFullName());
-            helper.execute();
+        sqlHelper.make("INSERT INTO resume(UUID, FULL_NAME) VALUES (?,?)", (helper) -> {
+            try {
+                helper.setString(1, r.getUuid());
+                helper.setString(2, r.getFullName());
+                helper.execute();
+            } catch (SQLException e) {
+                if (e.getSQLState().equals("23505")) {
+                    throw new ExistStorageException(null);
+                } else {
+                    throw new StorageException(null);
+                }
+            }
             return null;
         });
+
     }
 
     @Override
     public Resume get(Resume r) {
         LOG.info("Get " + r);
-        sqlHelper.setSqlCommand("SELECT * from resume r WHERE r.uuid = ?");
-        return (Resume) sqlHelper.make((helper) -> {
+        return (Resume) sqlHelper.make("SELECT * from resume r WHERE r.uuid = ?", (helper) -> {
             helper.setString(1, r.getUuid());
             ResultSet rs = helper.executeQuery();
             if (!rs.next()) {
@@ -71,10 +80,11 @@ public class SqlStorage implements Storage {
     @Override
     public void delete(Resume r) {
         LOG.info("Delete " + r);
-        sqlHelper.setSqlCommand("DELETE from resume where uuid = ?");
-        sqlHelper.make((helper) -> {
+        sqlHelper.make("DELETE from resume where uuid = ?", (helper) -> {
             helper.setString(1, r.getUuid());
-            helper.execute();
+            if (helper.executeUpdate() == 0) {
+                throw new NotExistStorageException(r.getUuid());
+            }
             return null;
         });
     }
@@ -83,8 +93,7 @@ public class SqlStorage implements Storage {
     public List<Resume> getAllSorted() {
         LOG.info("Get all sorted");
         List<Resume> resumes = new ArrayList<>();
-        sqlHelper.setSqlCommand("SELECT * FROM resume ORDER BY full_name,uuid");
-        sqlHelper.make((helper) -> {
+        sqlHelper.make("SELECT * FROM resume ORDER BY full_name,uuid", (helper) -> {
             ResultSet rs = helper.executeQuery();
             while (rs.next()) {
                 resumes.add(new Resume(rs.getString("uuid"), rs.getString("full_name")));
@@ -97,14 +106,9 @@ public class SqlStorage implements Storage {
     @Override
     public int size() {
         LOG.info("Get size");
-        sqlHelper.setSqlCommand("SELECT count(uuid) FROM resume");
-        return (int) sqlHelper.make((helper)->{
+        return (int) sqlHelper.make("SELECT count(uuid) FROM resume", (helper) -> {
             ResultSet rs = helper.executeQuery();
-            int size = -1;
-            while(rs.next()){
-                size=rs.getInt(1);
-            }
-            return size;
+            return rs.next() ? rs.getInt(1) : rs.next();
         });
     }
 }
