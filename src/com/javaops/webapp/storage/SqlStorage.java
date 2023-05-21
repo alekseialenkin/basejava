@@ -108,7 +108,7 @@ public class SqlStorage implements Storage {
         LOG.info("Get size");
         return (int) sqlHelper.make("SELECT count(uuid) FROM resume", (helper) -> {
             ResultSet rs = helper.executeQuery();
-            return rs.next() ? rs.getInt(1) : rs.next();
+            return rs.next() ? rs.getInt(1) : -1;
         });
     }
 }
