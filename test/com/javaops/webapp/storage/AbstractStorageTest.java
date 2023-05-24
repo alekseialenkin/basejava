@@ -3,6 +3,7 @@ package com.javaops.webapp.storage;
 import com.javaops.webapp.Config;
 import com.javaops.webapp.exception.ExistStorageException;
 import com.javaops.webapp.exception.NotExistStorageException;
+import com.javaops.webapp.model.ContactType;
 import com.javaops.webapp.model.Resume;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,8 +30,8 @@ public abstract class AbstractStorageTest {
         r1 = new Resume(UUID_1, FULLNAME_1);
         r2 = new Resume(UUID_2, FULLNAME_2);
         r3 = new Resume(UUID_3, FULLNAME_3);
-//        r1.addContact(ContactType.EMAIL, "mail1@ya.ru");
-//        r1.addContact(ContactType.PHONE_NUMBER, "11111");
+        r1.addContact(ContactType.EMAIL, "mail1@ya.ru");
+        r1.addContact(ContactType.PHONE_NUMBER, "11111");
 //        r1.addSection(SectionType.OBJECTIVE, new TextSection("Objective1"));
 //        r1.addSection(SectionType.PERSONAL, new TextSection("Personal data"));
 //        r1.addSection(SectionType.ACHIEVEMENT, new ListSection("Achivment11", "Achivment12", "Achivment13"));
@@ -46,8 +47,8 @@ public abstract class AbstractStorageTest {
 //                                new Company.Period(1996, Month.JANUARY, 2000, Month.DECEMBER, "aspirant", null),
 //                                new Company.Period(2001, Month.MARCH, 2005, Month.JANUARY, "student", "IT facultet")),
 //                        new Company("Company12", "http://Company12.ru")));
-//        r2.addContact(ContactType.SKYPE, "skype2");
-//        r2.addContact(ContactType.PHONE_NUMBER, "22222");
+        r2.addContact(ContactType.SKYPE, "skype2");
+        r2.addContact(ContactType.PHONE_NUMBER, "22222");
 //        r1.addSection(SectionType.EXPERIENCE,
 //                new CompanySection(
 //                        new Company("Company2", "http://Company2.ru",
@@ -79,7 +80,9 @@ public abstract class AbstractStorageTest {
 
     @Test
     public void update() {
-        Resume newResume = new Resume(UUID_2, FULLNAME_2);
+        Resume newResume = new Resume(UUID_2, "New Name");
+        newResume.addContact(ContactType.PHONE_NUMBER,"5555");
+        newResume.addContact(ContactType.SKYPE,"discord");
         storage.update(newResume);
         Assertions.assertEquals(newResume, storage.get(r2));
     }
