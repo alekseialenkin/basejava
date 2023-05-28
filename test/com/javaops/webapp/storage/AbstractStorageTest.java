@@ -3,8 +3,7 @@ package com.javaops.webapp.storage;
 import com.javaops.webapp.Config;
 import com.javaops.webapp.exception.ExistStorageException;
 import com.javaops.webapp.exception.NotExistStorageException;
-import com.javaops.webapp.model.ContactType;
-import com.javaops.webapp.model.Resume;
+import com.javaops.webapp.model.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,10 +31,10 @@ public abstract class AbstractStorageTest {
         r3 = new Resume(UUID_3, FULLNAME_3);
         r1.addContact(ContactType.EMAIL, "mail1@ya.ru");
         r1.addContact(ContactType.PHONE_NUMBER, "11111");
-//        r1.addSection(SectionType.OBJECTIVE, new TextSection("Objective1"));
-//        r1.addSection(SectionType.PERSONAL, new TextSection("Personal data"));
-//        r1.addSection(SectionType.ACHIEVEMENT, new ListSection("Achivment11", "Achivment12", "Achivment13"));
-//        r1.addSection(SectionType.QUALIFICATIONS, new ListSection("Java", "SQL", "JavaScript"));
+        r1.addSection(SectionType.OBJECTIVE, new TextSection("Objective1"));
+        r1.addSection(SectionType.PERSONAL, new TextSection("Personal data"));
+        r1.addSection(SectionType.ACHIEVEMENT, new ListSection("Achievement11", "Achievement12", "Achievement13"));
+        r1.addSection(SectionType.QUALIFICATIONS, new ListSection("Java", "SQL", "JavaScript"));
 //        r1.addSection(SectionType.EXPERIENCE,
 //                new CompanySection(
 //                        new Company("Company11", "http://Company11.ru",
@@ -83,6 +82,8 @@ public abstract class AbstractStorageTest {
         Resume newResume = new Resume(UUID_2, "New Name");
         newResume.addContact(ContactType.PHONE_NUMBER,"5555");
         newResume.addContact(ContactType.SKYPE,"discord");
+        newResume.addSection(SectionType.ACHIEVEMENT,new ListSection("new achievement1","new achievement2"));
+        newResume.addSection(SectionType.PERSONAL, new TextSection("new personal1"));
         storage.update(newResume);
         Assertions.assertEquals(newResume, storage.get(r2));
     }
