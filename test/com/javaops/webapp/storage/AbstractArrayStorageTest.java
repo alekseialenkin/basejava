@@ -4,6 +4,8 @@ import com.javaops.webapp.exception.StorageException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static com.javaops.webapp.TestData.dummy;
+
 public abstract class AbstractArrayStorageTest extends AbstractStorageTest {
     public AbstractArrayStorageTest(Storage storage) {
         super(storage);

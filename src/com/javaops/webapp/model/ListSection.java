@@ -41,8 +41,6 @@ public class ListSection extends AbstractSection {
 
     @Override
     public String toString() {
-        return "ListSection{" +
-                "strings=" + strings +
-                '}';
+        return String.join(", ",strings);
     }
 }

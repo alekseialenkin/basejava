@@ -18,9 +18,9 @@
         <entry>
             <key>ACHIEVEMENT</key>
             <value xsi:type="listSection" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                <strings>Achivment11</strings>
-                <strings>Achivment12</strings>
-                <strings>Achivment13</strings>
+                <strings>Achievement11</strings>
+                <strings>Achievement12</strings>
+                <strings>Achievement13</strings>
             </value>
         </entry>
         <entry>

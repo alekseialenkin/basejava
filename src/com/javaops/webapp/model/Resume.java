@@ -5,7 +5,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.*;
+import java.time.Month;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Initial resume class
@@ -23,6 +27,16 @@ public class Resume implements Serializable {
 
     public Resume(String fullName) {
         this(UUID.randomUUID().toString(), fullName);
+        this.addSection(SectionType.OBJECTIVE, new TextSection(" "));
+        this.addSection(SectionType.PERSONAL, new TextSection(" "));
+        this.addSection(SectionType.ACHIEVEMENT, new ListSection(" "));
+        this.addSection(SectionType.QUALIFICATIONS, new ListSection(" "));
+        this.addSection(SectionType.EXPERIENCE, new CompanySection(new Company(" ", " ",
+                new Company.Period(0, Month.JANUARY,
+                " ", " "))));
+        this.addSection(SectionType.EDUCATION,new CompanySection(new Company(" ", " ",
+                new Company.Period(0, Month.JANUARY,
+                        " ", " "))));
     }
 
     public Resume() {
@@ -56,6 +70,11 @@ public class Resume implements Serializable {
         return fullName;
     }
 
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+
     public Map<SectionType, AbstractSection> getSections() {
         return sections;
     }
@@ -80,5 +99,13 @@ public class Resume implements Serializable {
                 ", sections=" + sections +
                 ", contacts=" + contacts +
                 '}';
+    }
+
+    public String getContact(ContactType contactType) {
+        return contacts.get(contactType);
+    }
+
+    public AbstractSection getSection(SectionType sectionType) {
+        return sections.get(sectionType);
     }
 }
