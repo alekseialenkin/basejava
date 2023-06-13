@@ -16,7 +16,7 @@
         <input type="hidden" name="uuid" value="${resume.uuid}">
         <dl>
             <dt>Имя:</dt>
-            <dd><input type="text" name="fullName" size=50 value="${resume.fullName}"></dd>
+            <dd><input type="text" name="fullName" size=50 value="${resume.fullName.trim()}"></dd>
         </dl>
         <h3>Контакты:</h3>
         <c:forEach var="type" items="<%=ContactType.values()%>">
@@ -28,10 +28,9 @@
         <hr>
         <h3> Секции</h3>
 
-        <c:forEach var="sectionEntry" items="${resume.sections}" varStatus="counter">
+        <c:forEach var="sectionEntry" items="${resume.sections}">
             <jsp:useBean id="sectionEntry"
                          type="java.util.Map.Entry<com.javaops.webapp.model.SectionType, com.javaops.webapp.model.AbstractSection>"/>
-
             <%=sectionEntry.getKey().toHtmlEdit(sectionEntry.getValue(),sectionEntry.getKey())%>
         </c:forEach>
         <button type="submit">Сохранить</button>

@@ -28,25 +28,22 @@ public class ResumeServlet extends HttpServlet {
         String uuid = request.getParameter("uuid");
         String action = request.getParameter("action");
         if (action == null) {
-            request.setAttribute("resumes", storage.getAllSorted());
-            request.getRequestDispatcher("/WEB-INF/jsp/list.jsp").forward(request, response);
+            getStartedPage(request, response);
             return;
         }
         Resume r;
         switch (action) {
-            case "delete":
+            case "delete" -> {
                 storage.delete(uuid);
                 response.sendRedirect("resume");
                 return;
-            case "view", "edit":
-                r = storage.get(uuid);
-                break;
-            case "new":
+            }
+            case "view", "edit" -> r = storage.get(uuid);
+            case "new" -> {
                 r = new Resume(" ");
                 storage.save(r);
-                break;
-            default:
-                throw new IllegalStateException("Action " + action + " is illegal");
+            }
+            default -> throw new IllegalStateException("Action " + action + " is illegal");
         }
         request.setAttribute("resume", r);
         request.getRequestDispatcher(("view".equals(action) ? "/WEB-INF/jsp/view.jsp" : "/WEB-INF/jsp/edit.jsp")
@@ -58,6 +55,11 @@ public class ResumeServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String uuid = request.getParameter("uuid");
         String fullName = request.getParameter("fullName");
+        if (fullName.trim().length() == 0) {
+            storage.delete(uuid);
+            getStartedPage(request, response);
+            return;
+        }
         Resume r = storage.get(uuid);
         r.setFullName(fullName);
         for (ContactType type : ContactType.values()) {
@@ -74,7 +76,7 @@ public class ResumeServlet extends HttpServlet {
             String[] valuesName = request.getParameterValues(type.name());
             if (value != null && value.trim().length() != 0) {
                 switch (type) {
-                    case PERSONAL, OBJECTIVE -> r.addSection(type, new TextSection(value));
+                    case PERSONAL, OBJECTIVE -> r.addSection(type, new TextSection(value.trim()));
                     case ACHIEVEMENT, QUALIFICATIONS -> r.addSection(type, new ListSection(value.split(",")));
                     case EDUCATION, EXPERIENCE -> {
                         List<Company> companies = new ArrayList<>();
@@ -85,17 +87,16 @@ public class ResumeServlet extends HttpServlet {
                             String[] valuesDescription = request.getParameterValues(type.name() + i + "description");
                             List<Link> links = new ArrayList<>();
                             for (int j = 0; j < valuesURL.length; j++) {
-                                links.add(new Link(valuesName[j], valuesURL[j]));
+                                links.add(new Link(valuesName[j].trim(), valuesURL[j].trim()));
                             }
                             List<Company.Period> periods = new ArrayList<>();
                             if (valuesTitle != null) {
                                 for (int j = 0; j < valuesTitle.length; j++) {
-                                    periods.add(new Company.Period(Integer.parseInt(valuesBegin[j].split("-")[0]),
-                                            Month.of(Integer.parseInt(valuesBegin[j].split("-")[1])),
-                                            Integer.parseInt(valuesEnd[j].split("-")[0]),
-                                            Month.of(Integer.parseInt(valuesEnd[j].split("-")[1])),
-                                            valuesTitle[j], valuesDescription[j]));
-
+                                    periods.add(new Company.Period(Integer.parseInt(valuesBegin[j].trim().split("-")[0]),
+                                            Month.of(Integer.parseInt(valuesBegin[j].trim().split("-")[1])),
+                                            Integer.parseInt(valuesEnd[j].trim().split("-")[0]),
+                                            Month.of(Integer.parseInt(valuesEnd[j].trim().split("-")[1])),
+                                            valuesTitle[j].trim(), valuesDescription[j].trim()));
                                 }
                             }
                             companies.add(new Company(links.get(i), periods));
@@ -109,5 +110,10 @@ public class ResumeServlet extends HttpServlet {
         }
         storage.update(r);
         response.sendRedirect("resume");
+    }
+
+    private void getStartedPage(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setAttribute("resumes", storage.getAllSorted());
+        request.getRequestDispatcher("/WEB-INF/jsp/list.jsp").forward(request, response);
     }
 }

@@ -50,7 +50,6 @@ public enum SectionType {
     EXPERIENCE("Опыт работы") {
         @Override
         public String toHtml(AbstractSection value) {
-            i=0;
             return (value == null) ? "" : toHtml0(((CompanySection) value).getCompanies());
         }
 
@@ -66,22 +65,7 @@ public enum SectionType {
 
         @Override
         public String toHtmlEdit(AbstractSection value, SectionType key) {
-            StringBuilder st = new StringBuilder();
-            st.append("<p><h4>").append(key.getTitle()).append("</h4></p>");
-            for (Company c : ((CompanySection) value).getCompanies()) {
-                st.append("<dl>" + "<dt>" + "URL" + "</dt>" + "<dd><input type='text' name='").append(key).append("url'").append("size=30 value='").append(c.getWebsite().getUrl()).append("'></dd>");
-                st.append("<dt>" + "Название" + "</dt>" + "<dd><input type='text' name='").append(key).append("'").append("size=30 value='").append(c.getWebsite().getName()).append("'></dd>");
-                for (Company.Period p : c.getPeriods()) {
-                    st.append("<p>" + "<dt>" + "Дата начала" + "<dd><input type='text' name='").append(key).append(i).append("begin'").append("size=30 value='").append(p.getBegin().toString()).append("'></dd>").append("</dt>");
-                    st.append("<dt>" + "Дата окончания" + "<dd><input type='text' name='").append(key).append(i).append("end'").append("size=30 value='").append(p.getEnd().toString()).append("'></dd>").append("</dt>").append("</p>");
-                    st.append("<p>" + "<dt>" + "Заголовок" + "<dd><input type='text' name='").append(key).append(i).append("title'").append("size=30 value='").append(p.getTitle()).append("'></dd>").append("</dt>");
-                    st.append("<dt>" + "Описание" + "<dd><input type='text' name='").append(key).append(i).append("description'").append("size=30 value='").append(p.getDescription()).append("'></dd>").append("</dt>").append("</p>");
-                }
-                st.append("</dl>");
-            }
-            i++;
-            System.out.println(i);
-            return st.toString();
+           return editCategories(value,key);
         }
     },
     EDUCATION("Образование") {
@@ -102,22 +86,7 @@ public enum SectionType {
 
         @Override
         public String toHtmlEdit(AbstractSection value, SectionType key) {
-            StringBuilder st = new StringBuilder();
-            st.append("<p><h4>").append(key.getTitle()).append("</h4></p>");
-            for (Company c : ((CompanySection) value).getCompanies()) {
-                st.append("<dl>" + "<dt>" + "URL" + "</dt>" + "<dd><input type='text' name='").append(key).append("url'").append("size=30 value='").append(c.getWebsite().getUrl()).append("'></dd>");
-                st.append("<dt>" + "Название" + "</dt>" + "<dd><input type='text' name='").append(key).append("'").append("size=30 value='").append(c.getWebsite().getName()).append("'></dd>");
-                for (Company.Period p : c.getPeriods()) {
-                    st.append("<p>" + "<dt>" + "Дата начала" + "<dd><input type='text' name='").append(key).append(i).append("begin'").append("size=30 value='").append(p.getBegin().toString()).append("'></dd>").append("</dt>");
-                    st.append("<dt>" + "Дата окончания" + "<dd><input type='text' name='").append(key).append(i).append("end'").append("size=30 value='").append(p.getEnd().toString()).append("'></dd>").append("</dt>").append("</p>");
-                    st.append("<p>" + "<dt>" + "Заголовок" + "<dd><input type='text' name='").append(key).append(i).append("title'").append("size=30 value='").append(p.getTitle()).append("'></dd>").append("</dt>");
-                    st.append("<dt>" + "Описание" + "<dd><input type='text' name='").append(key).append(i).append("description'").append("size=30 value='").append(p.getDescription()).append("'></dd>").append("</dt>").append("</p>");
-                }
-                st.append("</dl>");
-            }
-            i++;
-            System.out.println(i);
-            return st.toString();
+            return editCategories(value,key);
         }
     };
     private final String title;
@@ -159,7 +128,26 @@ public enum SectionType {
     public String toHtmlEdit(AbstractSection value, SectionType key) {
         return "<dl><dt>" + key.name() + "</dt><dd><input type='text' name='" + key + "'size=30 value=''" + "></dd>" + "</dt>";
     }
-    public int i;
+    public String editCategories(AbstractSection value, SectionType key){
+        i = 0;
+        StringBuilder st = new StringBuilder();
+        st.append("<p><h4>").append(key.getTitle()).append("</h4></p>");
+        for (Company c : ((CompanySection) value).getCompanies()) {
+            st.append("<dl>" + "<dt>" + "URL" + "</dt>" + "<dd><input type='text' name='").append(key).append("url'").append("size=30 value='").append(c.getWebsite().getUrl()).append("'></dd>");
+            st.append("<dt>" + "Название" + "</dt>" + "<dd><input type='text' name='").append(key).append("'").append("size=30 value='").append(c.getWebsite().getName()).append("'></dd>");
+            for (Company.Period p : c.getPeriods()) {
+                st.append("<p>" + "<dt>" + "Дата начала" + "<dd><input type='text' name='").append(key).append(i).append("begin'").append("size=30 value='").append(p.getBegin().toString()).append("'></dd>").append("</dt>");
+                st.append("<dt>" + "Дата окончания" + "<dd><input type='text' name='").append(key).append(i).append("end'").append("size=30 value='").append(p.getEnd().toString()).append("'></dd>").append("</dt>").append("</p>");
+                st.append("<p>" + "<dt>" + "Заголовок" + "<dd><input type='text' name='").append(key).append(i).append("title'").append("size=30 value='").append(p.getTitle()).append("'></dd>").append("</dt>");
+                st.append("<dt>" + "Описание" + "<dd><input type='text' name='").append(key).append(i).append("description'").append("size=30 value='").append(p.getDescription()).append("'></dd>").append("</dt>").append("</p>");
+            }
+            st.append("</dl>");
+        }
+        i++;
+        return st.toString();
+    }
+    protected int i = 0;
+
     public String getTitle() {
         return title;
     }
