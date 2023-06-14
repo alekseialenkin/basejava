@@ -92,6 +92,13 @@ public class Company implements Serializable {
             this(DateUtil.of(startYear, startMonth), DateUtil.of(endYear, endMonth), title, description);
         }
 
+        public Period(String title, String description) {
+            this.title = title;
+            this.description = description;
+            begin = DateUtil.of(0,Month.JANUARY);
+            end = DateUtil.of(0,Month.JANUARY);
+        }
+
         public Period(LocalDate begin, LocalDate end, String title, String description) {
             this.begin = begin;
             this.end = end;

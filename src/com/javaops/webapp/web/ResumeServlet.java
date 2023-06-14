@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,11 +91,7 @@ public class ResumeServlet extends HttpServlet {
                             List<Company.Period> periods = new ArrayList<>();
                             if (valuesTitle != null) {
                                 for (int j = 0; j < valuesTitle.length; j++) {
-                                    periods.add(new Company.Period(Integer.parseInt(valuesBegin[j].trim().split("-")[0]),
-                                            Month.of(Integer.parseInt(valuesBegin[j].trim().split("-")[1])),
-                                            Integer.parseInt(valuesEnd[j].trim().split("-")[0]),
-                                            Month.of(Integer.parseInt(valuesEnd[j].trim().split("-")[1])),
-                                            valuesTitle[j].trim(), valuesDescription[j].trim()));
+                                    periods.add(new Company.Period(valuesTitle[j].trim(), valuesDescription[j].trim()));
                                 }
                             }
                             companies.add(new Company(links.get(i), periods));
