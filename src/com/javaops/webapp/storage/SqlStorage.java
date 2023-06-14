@@ -76,8 +76,8 @@ public class SqlStorage implements Storage {
                 }
                 resume = new Resume(uuid, rs.getString("full_name"));
             }
-            addToResume("SELECT * FROM contact WHERE resume_uuid =?",conn,resume);
-            addToResume("SELECT * FROM section WHERE resume_uuid =?",conn,resume);
+            addToResume("SELECT * FROM contact WHERE resume_uuid =?", conn, resume);
+            addToResume("SELECT * FROM section WHERE resume_uuid =?", conn, resume);
             return resume;
         });
     }
@@ -105,7 +105,9 @@ public class SqlStorage implements Storage {
                     Resume r = new Resume(rs.getString("uuid"), rs.getString("full_name"));
                     addToResume("SELECT * FROM contact WHERE resume_uuid=?", conn, r);
                     addToResume("SELECT * FROM section where resume_uuid=?", conn, r);
-                    resumes.add(r);
+                    if (r.getFullName().trim().length() != 0) {
+                        resumes.add(r);
+                    }
                 }
             }
             return null;

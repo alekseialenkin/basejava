@@ -118,8 +118,7 @@ public enum SectionType {
         st.append("<section>");
         st.append("<table>").append("<caption>").append("<a href='").append(c.getWebsite().getUrl()).append("'>").append(c.getWebsite().getName()).append("</a>").append("</caption>");
         for (Company.Period p : c.getPeriods()) {
-            st.append("<tr>").append("<th>").append(p.getBegin().getMonthValue()).append("/").append(p.getBegin().getYear())
-                    .append("-").append(p.getEnd().getMonthValue()).append("/").append(p.getEnd().getYear()).append("</th>").append("<th>").append(p.getTitle()).append("</th>").append("</tr>");
+            st.append("<tr>").append("<th>").append(p.getTitle()).append("</th>").append("</tr>");
             st.append("<tr>").append("<td></td>").append("<td>").append(p.getDescription()).append("</td>").append("</tr>");
         }
         st.append("</table>").append("</section>");
@@ -136,8 +135,6 @@ public enum SectionType {
             st.append("<dl>" + "<dt>" + "URL" + "</dt>" + "<dd><input type='text' name='").append(key).append("url'").append("size=30 value='").append(c.getWebsite().getUrl()).append("'></dd>");
             st.append("<dt>" + "Название" + "</dt>" + "<dd><input type='text' name='").append(key).append("'").append("size=30 value='").append(c.getWebsite().getName()).append("'></dd>");
             for (Company.Period p : c.getPeriods()) {
-                st.append("<p>" + "<dt>" + "Дата начала" + "<dd><input type='text' name='").append(key).append(i).append("begin'").append("size=30 value='").append(p.getBegin().toString()).append("'></dd>").append("</dt>");
-                st.append("<dt>" + "Дата окончания" + "<dd><input type='text' name='").append(key).append(i).append("end'").append("size=30 value='").append(p.getEnd().toString()).append("'></dd>").append("</dt>").append("</p>");
                 st.append("<p>" + "<dt>" + "Заголовок" + "<dd><input type='text' name='").append(key).append(i).append("title'").append("size=30 value='").append(p.getTitle()).append("'></dd>").append("</dt>");
                 st.append("<dt>" + "Описание" + "<dd><input type='text' name='").append(key).append(i).append("description'").append("size=30 value='").append(p.getDescription()).append("'></dd>").append("</dt>").append("</p>");
             }
