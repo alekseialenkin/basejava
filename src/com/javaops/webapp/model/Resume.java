@@ -27,16 +27,16 @@ public class Resume implements Serializable {
 
     public Resume(String fullName) {
         this(UUID.randomUUID().toString(), fullName);
-        this.addSection(SectionType.OBJECTIVE, new TextSection(" "));
-        this.addSection(SectionType.PERSONAL, new TextSection(" "));
-        this.addSection(SectionType.ACHIEVEMENT, new ListSection(" "));
-        this.addSection(SectionType.QUALIFICATIONS, new ListSection(" "));
-        this.addSection(SectionType.EXPERIENCE, new CompanySection(new Company(" ", " ",
+        this.addSection(SectionType.OBJECTIVE, new TextSection(""));
+        this.addSection(SectionType.PERSONAL, new TextSection(""));
+        this.addSection(SectionType.ACHIEVEMENT, new ListSection(""));
+        this.addSection(SectionType.QUALIFICATIONS, new ListSection(""));
+        this.addSection(SectionType.EXPERIENCE, new CompanySection(new Company("", "",
                 new Company.Period(0, Month.JANUARY,
-                " ", " "))));
-        this.addSection(SectionType.EDUCATION,new CompanySection(new Company(" ", " ",
+                "", ""))));
+        this.addSection(SectionType.EDUCATION,new CompanySection(new Company("", "",
                 new Company.Period(0, Month.JANUARY,
-                        " ", " "))));
+                        "", ""))));
     }
 
     public Resume() {

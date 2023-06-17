@@ -33,7 +33,7 @@ public enum SectionType {
 
         @Override
         public String toHtmlEdit(AbstractSection value, SectionType key) {
-            return "<dl>" + "<dt>" + key.getTitle() + "</dt>" + "<textarea name='" + key + "'>" + String.join(",", ((ListSection) value).getStrings()) + "</textarea>" + "</dl>";
+            return "<dl>" + "<dt>" + key.getTitle() + "</dt>" + "<textarea name='" + key + "'>" + String.join("\n", ((ListSection) value).getStrings()) + "</textarea>" + "</dl>";
         }
     },
     QUALIFICATIONS("Квалификация") {
@@ -44,7 +44,7 @@ public enum SectionType {
 
         @Override
         public String toHtmlEdit(AbstractSection value, SectionType key) {
-            return "<dl>" + "<dt>" + key.getTitle() + "</dt>" + "<textarea name='" + key + "'>" + String.join(",", ((ListSection) value).getStrings()) + "</textarea>" + "</dl>";
+            return "<dl>" + "<dt>" + key.getTitle() + "</dt>" + "<textarea name='" + key + "'>" + String.join("\n", ((ListSection) value).getStrings()) + "</textarea>" + "</dl>";
         }
     },
     EXPERIENCE("Опыт работы") {

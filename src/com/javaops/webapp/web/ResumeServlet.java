@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,9 +38,34 @@ public class ResumeServlet extends HttpServlet {
                 response.sendRedirect("resume");
                 return;
             }
-            case "view", "edit" -> r = storage.get(uuid);
+            case "view" -> r = storage.get(uuid);
+            case "edit" -> {
+                r = storage.get(uuid);
+                for (SectionType type : SectionType.values()){
+                    AbstractSection section = r.getSection(type);
+                    switch (type){
+                        case PERSONAL, OBJECTIVE -> {
+                            if (section == null){
+                                r.addSection(type,new TextSection(""));
+                            }
+                        }
+                        case ACHIEVEMENT, QUALIFICATIONS -> {
+                            if (section == null){
+                                r.addSection(type,new ListSection(""));
+                            }
+                        }
+                        case EDUCATION, EXPERIENCE->{
+                            if (section==null){
+                                r.addSection(type,new CompanySection(new Company("", "",
+                                        new Company.Period(0, Month.JANUARY,
+                                                "", ""))));
+                            }
+                        }
+                    }
+                }
+            }
             case "new" -> {
-                r = new Resume(" ");
+                r = new Resume("");
                 storage.save(r);
             }
             default -> throw new IllegalStateException("Action " + action + " is illegal");
@@ -76,7 +102,7 @@ public class ResumeServlet extends HttpServlet {
             if (value != null && value.trim().length() != 0) {
                 switch (type) {
                     case PERSONAL, OBJECTIVE -> r.addSection(type, new TextSection(value.trim()));
-                    case ACHIEVEMENT, QUALIFICATIONS -> r.addSection(type, new ListSection(value.split(",")));
+                    case ACHIEVEMENT, QUALIFICATIONS -> r.addSection(type, new ListSection(value.split("\n")));
                     case EDUCATION, EXPERIENCE -> {
                         List<Company> companies = new ArrayList<>();
                         for (int i = 0; i < valuesName.length; i++) {
