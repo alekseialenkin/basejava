@@ -153,10 +153,16 @@ public enum SectionType {
             st.append("<dl>" + "<dt>" + "URL" + "</dt>" + "<dd><input type='text' name='").append(key).append("url'").append("size=30 value='").append(c.getWebsite().getUrl()).append("'></dd>");
             st.append("<dt>" + "Название" + "</dt>" + "<dd><input type='text' name='").append(key).append("'").append("size=30 value='").append(c.getWebsite().getName()).append("'></dd>");
             for (Company.Period p : c.getPeriods()) {
-                st.append("<p>" + "<dt>" + "Дата начала" + "<dd><input type='text' name='").append(key).append(i).append("begin'").append("size=30 value='").append("' placeholder='ММ/ГГГГ'></dd>").append("</dt>");
-                st.append("<dt>" + "Дата окончания" + "<dd><input type='text' name='").append(key).append(i).append("end'").append("size=30 value='' placeholder='ММ/ГГГГ'></dd>").append("</dt>").append("</p>");
-                st.append("<p>" + "<dt>" + "Заголовок" + "<dd><input type='text' name='").append(key).append(i).append("title'").append("size=30 value='").append(p.getTitle()).append("'></dd>").append("</dt>");
-                st.append("<dt>" + "Описание" + "<dd><input type='text' name='").append(key).append(i).append("description'").append("size=30 value='").append(p.getDescription()).append("'></dd>").append("</dt>").append("</p>");
+                if (p.getBegin().getYear() == 0 || p.getEnd().equals(DateUtil.NOW)){
+                    st.append("<p>" + "<dt>" + "Дата начала" + "<dd><input type='text' name='").append(key).append(i).append("begin'").append("size=30 value='' placeholder='ММ/ГГГГ'></dd>").append("</dt>");
+                    st.append("<dt>" + "Дата окончания" + "<dd><input type='text' name='").append(key).append(i).append("end'").append("size=30 value=''placeholder='ММ/ГГГГ'></dd>").append("</dt>").append("</p>");
+                }else {
+                    st.append("<p>" + "<dt>" + "Дата начала" + "<dd><input type='text' name='").append(key).append(i).append("begin'").append("size=30 value='").append(p.getBegin().getMonthValue()).append("/").append(p.getBegin().getYear()).append("' placeholder='ММ/ГГГГ'></dd>").append("</dt>");
+                    st.append("<dt>" + "Дата окончания" + "<dd><input type='text' name='").append(key).append(i).append("end'").append("size=30 value='").append(p.getEnd().getMonthValue()).append("/").append(p.getEnd().getYear()).append("'placeholder='ММ/ГГГГ'></dd>").append("</dt>").append("</p>");
+                }
+                    st.append("<p>" + "<dt>" + "Заголовок" + "<dd><input type='text' name='").append(key).append(i).append("title'").append("size=30 value='").append(p.getTitle()).append("'></dd>").append("</dt>");
+                    st.append("<dt>" + "Описание" + "<dd><input type='text' name='").append(key).append(i).append("description'").append("size=30 value='").append(p.getDescription()).append("'></dd>").append("</dt>").append("</p>");
+
             }
             st.append("</dl>");
             i++;
