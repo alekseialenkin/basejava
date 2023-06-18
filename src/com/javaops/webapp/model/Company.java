@@ -24,6 +24,8 @@ public class Company implements Serializable {
     private static final long serialVersionUID = 1L;
     private Link website;
     private List<Period> periods;
+    public static final Company EMPTY_COMPANY = new Company("","",Period.EMPTY);
+
 
     public Company() {
     }
@@ -80,6 +82,7 @@ public class Company implements Serializable {
         private LocalDate end;
         private String title;
         private String description;
+        public static final Period EMPTY = new Period(0,Month.JANUARY,"".trim(),"".trim());
 
         public Period() {
         }
@@ -91,14 +94,6 @@ public class Company implements Serializable {
         public Period(int startYear, Month startMonth, int endYear, Month endMonth, String title, String description) {
             this(DateUtil.of(startYear, startMonth), DateUtil.of(endYear, endMonth), title, description);
         }
-
-        public Period(String title, String description) {
-            this.title = title;
-            this.description = description;
-            begin = DateUtil.of(0,Month.JANUARY);
-            end = DateUtil.of(0,Month.JANUARY);
-        }
-
         public Period(LocalDate begin, LocalDate end, String title, String description) {
             this.begin = begin;
             this.end = end;

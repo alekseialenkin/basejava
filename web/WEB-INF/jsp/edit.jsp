@@ -27,10 +27,10 @@
         </c:forEach>
         <hr>
         <h3> Секции</h3>
-
         <c:forEach var="sectionEntry" items="${resume.sections}">
             <jsp:useBean id="sectionEntry"
                          type="java.util.Map.Entry<com.javaops.webapp.model.SectionType, com.javaops.webapp.model.AbstractSection>"/>
+
             <%=sectionEntry.getKey().toHtmlEdit(sectionEntry.getValue(),sectionEntry.getKey())%>
         </c:forEach>
         <button type="submit">Сохранить</button>

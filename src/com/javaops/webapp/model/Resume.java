@@ -5,7 +5,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Month;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
@@ -31,12 +30,8 @@ public class Resume implements Serializable {
         this.addSection(SectionType.PERSONAL, new TextSection(""));
         this.addSection(SectionType.ACHIEVEMENT, new ListSection(""));
         this.addSection(SectionType.QUALIFICATIONS, new ListSection(""));
-        this.addSection(SectionType.EXPERIENCE, new CompanySection(new Company("", "",
-                new Company.Period(0, Month.JANUARY,
-                "", ""))));
-        this.addSection(SectionType.EDUCATION,new CompanySection(new Company("", "",
-                new Company.Period(0, Month.JANUARY,
-                        "", ""))));
+        this.addSection(SectionType.EXPERIENCE, new CompanySection(Company.EMPTY_COMPANY));
+        this.addSection(SectionType.EDUCATION,new CompanySection(Company.EMPTY_COMPANY));
     }
 
     public Resume() {

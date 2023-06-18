@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ResumeServlet extends HttpServlet {
@@ -41,24 +42,26 @@ public class ResumeServlet extends HttpServlet {
             case "view" -> r = storage.get(uuid);
             case "edit" -> {
                 r = storage.get(uuid);
-                for (SectionType type : SectionType.values()){
+                for (SectionType type : SectionType.values()) {
                     AbstractSection section = r.getSection(type);
-                    switch (type){
+                    switch (type) {
                         case PERSONAL, OBJECTIVE -> {
-                            if (section == null){
-                                r.addSection(type,new TextSection(""));
+                            if (section == null) {
+                                r.addSection(type, new TextSection(""));
                             }
                         }
                         case ACHIEVEMENT, QUALIFICATIONS -> {
-                            if (section == null){
-                                r.addSection(type,new ListSection(""));
+                            if (section == null) {
+                                r.addSection(type, new ListSection(""));
                             }
                         }
-                        case EDUCATION, EXPERIENCE->{
-                            if (section==null){
-                                r.addSection(type,new CompanySection(new Company("", "",
-                                        new Company.Period(0, Month.JANUARY,
-                                                "", ""))));
+                        case EDUCATION, EXPERIENCE -> {
+                            if (section == null) {
+                                r.addSection(type, new CompanySection(Company.EMPTY_COMPANY));
+                            } else {
+                                List<Company> list = new ArrayList<>(((CompanySection) r.getSection(type)).getCompanies());
+                                list.add(Company.EMPTY_COMPANY);
+                                r.addSection(type, new CompanySection(list));
                             }
                         }
                     }
@@ -102,7 +105,11 @@ public class ResumeServlet extends HttpServlet {
             if (value != null && value.trim().length() != 0) {
                 switch (type) {
                     case PERSONAL, OBJECTIVE -> r.addSection(type, new TextSection(value.trim()));
-                    case ACHIEVEMENT, QUALIFICATIONS -> r.addSection(type, new ListSection(value.split("\n")));
+                    case ACHIEVEMENT, QUALIFICATIONS -> {
+                        List<String> list = new ArrayList<>(Arrays.asList(value.split("\n")));
+                        list.removeIf(s -> s.trim().length() == 0);
+                        r.addSection(type, new ListSection(list));
+                    }
                     case EDUCATION, EXPERIENCE -> {
                         List<Company> companies = new ArrayList<>();
                         for (int i = 0; i < valuesName.length; i++) {
@@ -117,8 +124,27 @@ public class ResumeServlet extends HttpServlet {
                             List<Company.Period> periods = new ArrayList<>();
                             if (valuesTitle != null) {
                                 for (int j = 0; j < valuesTitle.length; j++) {
-                                    periods.add(new Company.Period(valuesTitle[j].trim(), valuesDescription[j].trim()));
+                                    if (valuesTitle[j].trim().length() != 0) {
+                                        try {
+                                            if (valuesEnd[j].trim().length()!=0) {
+                                                periods.add(new Company.Period(Integer.parseInt(valuesBegin[j].trim().split("/")[1].trim()),
+                                                        Month.of(Integer.parseInt(valuesBegin[j].trim().split("/")[0].trim())),
+                                                        Integer.parseInt(valuesEnd[j].trim().split("/")[1].trim()),
+                                                        Month.of(Integer.parseInt(valuesEnd[j].trim().split("/")[0].trim())),
+                                                        valuesTitle[j].trim(), valuesDescription[j].trim()));
+                                            } else {
+                                                periods.add(new Company.Period(Integer.parseInt(valuesBegin[j].trim().split("/")[1].trim()),
+                                                        Month.of(Integer.parseInt(valuesBegin[j].trim().split("/")[0].trim())),
+                                                        valuesTitle[j].trim(), valuesDescription[j].trim()));
+                                            }
+                                        } catch (Exception e) {
+                                            periods.add(new Company.Period(0, Month.JANUARY, valuesTitle[j].trim(), valuesDescription[j].trim()));
+                                        }
+                                    }
                                 }
+                                periods.add(Company.Period.EMPTY);
+                            } else {
+                                periods.add(Company.Period.EMPTY);
                             }
                             companies.add(new Company(links.get(i), periods));
                         }
